@@ -29,49 +29,114 @@
       user-select: none;
       line-height: 1.8;
       color: #1e293b;
-      overflow: auto;
+      overflow: auto; /* ✅ 最外層可滾 */
     }
 
-    #root { min-height: 100vh; }
+    #root { height: 100%; }
+    #root > * { height: 100%; }
 
     .glass { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(15px); }
     .btn-cute { transition: all 0.2s; box-shadow: 0 5px 0 #93c5fd; border: 2px solid #bfdbfe; }
     .btn-cute:active { transform: translateY(3px); box-shadow: 0 2px 0 #93c5fd; }
 
     .intro-scroll {
-      font-size: 1.35rem;
-      line-height: 2.2;
+      font-size: 1.5rem;
+      line-height: 2.3;
       font-weight: bold;
+      overflow-y: auto;
+      max-height: 58vh;
+      padding-right: 10px;
+      overflow-x: hidden;      /* ✅ 不橫向溢出 */
+      word-break: break-word;  /* ✅ 強制斷行 */
+    }
+    .item-card { background: white; border-radius: 40px; padding: 1.8rem; margin-bottom: 1.5rem; border: 2px solid #f1f5f9; }
+    .info-card {
+      background: white;
+      border-radius: 40px;
+      padding: 1.8rem;
+      border-left: 14px solid #3b82f6;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
       overflow-x: hidden;
       word-break: break-word;
     }
     .intro-scroll::-webkit-scrollbar { width: 4px; }
     .intro-scroll::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
 
-    /* ✅ 行程卡片略縮小（不減資訊） */
-    .item-card {
-      background: white;
-      border-radius: 34px;
-      padding: 1.35rem;
-      margin-bottom: 1.1rem;
-      border: 2px solid #f1f5f9;
+    /* ===== S23 Ultra 桌機模擬器（比例預覽用）===== */
+    .desk-wrap{
+      min-height: 100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 28px 28px 80px;
+      background: radial-gradient(1200px 600px at 50% 0%, #dbeafe 0%, #eef2ff 55%, #f8fafc 100%);
     }
-
-    .info-card {
-      background: white;
-      border-radius: 34px;
-      padding: 1.35rem;
-      border-left: 14px solid #3b82f6;
-      margin-bottom: 1.4rem;
-      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
-      overflow-x: hidden;
-      word-break: break-word;
+    .phone-shell{
+      position: relative;
+      width: min(460px, 94vw);
+      aspect-ratio: 9 / 19.3; /* ✅ S23U 螢幕比例 */
+      border-radius: 54px;
+      padding: 16px;
+      background: linear-gradient(180deg, #0b1220 0%, #0f172a 40%, #0b1220 100%);
+      box-shadow:
+        0 40px 90px rgba(2, 6, 23, 0.35),
+        0 16px 30px rgba(2, 6, 23, 0.25);
+    }
+    .phone-shell::before{
+      content:"";
+      position:absolute;
+      inset: 10px;
+      border-radius: 44px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+      pointer-events:none;
+    }
+    .phone-notch{
+      position:absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 140px;
+      height: 28px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+      z-index: 50;
+      pointer-events:none;
+    }
+    .phone-screen{
+      width: 100%;
+      height: 100%;
+      background: #ffffff;
+      border-radius: 40px;
+      overflow: hidden; /* ✅ 螢幕邊界一定裁切 */
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .hint{
+      position: absolute;
+      bottom: -44px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 14px;
+      color: rgba(15,23,42,0.55);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans", sans-serif;
+      white-space: nowrap;
     }
   </style>
 </head>
 
 <body>
-  <div id="root"></div>
+  <div class="desk-wrap">
+    <div class="phone-shell">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div id="root"></div>
+      </div>
+      <div class="hint">S23 Ultra 比例預覽（19.3:9）</div>
+    </div>
+  </div>
 
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
@@ -88,7 +153,7 @@
         date: "3/11", title: "北極特快車 🎅", cities: [{n:"阿布達比", q:"Abu+Dhabi"}, {n:"哥本哈根", q:"Copenhagen"}, {n:"赫爾辛基", q:"Helsinki"}], kpArea: "赫爾辛基",
         items: [
           { time: "00:05", name: "EY899 抵達阿布達比", icon: "🇦🇪", intro: "近年以全新航廈(Terminal A)啟用，具備現代化設計、寬敞空間與完善的免稅購物體驗。身為阿提哈德航空樞紐，這裡擁有豐富的中東特色商品，特別是Bateel高檔椰棗、Al Nassma駱駝奶巧克力，是轉機掃貨的理想場所。", detail: "AUH 3/11 00:05抵達阿布達比(A航廈)" },
-          { time: "02:25", name: "EY177 阿布達比 ✈️ 哥本哈根", icon: "✈️", intro: "丹麥主要的國際機場，也是斯堪地那維亞半島規模最大的樞紐機場。為北歐航空和挪威航空的主要樞紐，必買特色伴手禮包括皇家哥本哈根名瓷 (Royal Copenhagen)：經典的丹麥藍色唐草瓷器、Jacobsens印有安徒生童話的丹麋奶油酥餅/餅乾、Summerbird丹麥手工巧克力。", detail: "02:25出發(A航廈) → CPH 7:00抵達(第2航廈)" },
+          { time: "02:25", name: "EY177 阿布達比 ✈️ 哥本哈根", icon: "✈️", intro: "丹麥主要的國際機場，也是斯堪地那維亞半島規模最大的樞紐機場。為北歐航空和挪威航空的主要樞紐，必買特色伴手禮包括皇家哥本哈根名瓷 (Royal Copenhagen)：經典的丹麥藍色唐草瓷器、Jacobsens印有安徒生童話的丹麥奶油酥餅/餅乾、Summerbird丹麥手工巧克力。", detail: "02:25出發(A航廈) → CPH 7:00抵達(第2航廈)" },
           { time: "12:45", name: "SK1712 哥本哈根 ✈️ 赫爾辛基", icon: "✈️", transport: "從第2航廈到第3航廈：步行約5-10分鐘，沿Terminal 3指標走室內連通道即可。", intro: "搭乘SK1712前往萬塔機場。", detail: "12:45出發(第3航廈) → 15:25抵達芬蘭赫爾辛基-萬塔機場" },
           { time: "16:30", name: "交通教學：坐車去首都赫爾辛基", icon: "🚌", transport: "搭乘火車 P 線或 I 線前往赫爾辛基機場，車程約 30 分鐘。票價約 4.1 歐元", intro: "先至車站地下一樓寄放行李再前往超市買晚餐。" },
           { time: "17:30", name: "K-Supermarket Postitalo 採買", icon: "🛒", nav: "https://maps.app.goo.gl/igK6ux5HdFChDgke7", intro: "網路上說熟食有烤雞、肉丸、薯泥等，必喝芬蘭藍莓汁，記得打包保冷袋" },
@@ -156,7 +221,7 @@
           { name: "SOUP+MORE 鮭魚湯", icon: "🍲", nav: "https://maps.app.goo.gl/URgMN58wNkSTpyHF9", intro: "位於赫爾辛基老農貿市場，是當地最著名的平價美食攤位。主打熱騰騰的芬蘭傳統奶油鮭魚湯 (Lohikeitto)，用料豐富，含鮭魚及馬鈴薯，另提供免費自助麵包與青醬，是高CP值的道地溫暖選擇。" },
           { name: "烏斯佩斯基大教堂", icon: "⛪", nav: "https://maps.app.goo.gl/m9uxHw6PrYXabQ889", intro: "建於1862-1868年，是北歐及西歐最大的東正教教堂。這座風格濃厚的「紅教堂」由俄國建築師設計，以紅色磚牆、金綠色洋蔥頂及13座象徵耶穌與使徒的尖塔為特色，呈現拜占庭式建築藝術。" },
           { name: "赫爾辛基座堂", icon: "⛪", nav: "https://maps.app.goo.gl/xyzWmWVRweKEm8Gc9", intro: "又稱「白教堂」，是芬蘭首都赫爾辛基的地標性建築。這座新古典主義風格的綠頂白牆教堂建於 1830-1852 年，矗立在參議院廣場，由德國建築師恩格爾設計，具有希臘十字平面、四面柱廊和中央大圓頂，周圍有四個小圓頂，顯現出對稱的宏偉美感。" },
-          { name: "參議院廣場", icon: "🏛️", nav: "https://maps.app.goo.gl/PXaWG2Ahv5XRHAHKA", intro: "芬蘭首都歷史最悠久、最具標誌性的廣場，也是當地政治、宗教與文化中心。廣場以白色震撼的赫爾辛基座堂為中心，四周環繞著新古典主義風格建築，包括政府宮、赫爾辛基大學主樓等，這片優雅的廣場由建築師卡爾·恩格爾設計。" },
+          { name: "參議院廣場", icon: "🏛️", nav: "https://maps.app.goo.gl/XJNu8Rj6P4Q9AgY88", intro: "芬蘭首都歷史最悠久、最具標誌性的廣場，也是當地政治、宗教與文化中心。廣場以白色震撼的赫爾辛基座堂為中心，四周環繞著新古典主義風格建築，包括政府宮、赫爾辛基大學主樓等，這片優雅的廣場由建築師卡爾·恩格爾設計。" },
           { name: "頌歌中央圖書館 Oodi", icon: "📚", nav: "https://maps.app.goo.gl/hYQr7z7ZiB4HnBmV9", intro: "頌歌中央圖書館(Oodi)於2018年底啟用，由芬蘭 ALA Architects 設計，外觀採用自然木材與玻璃的流線型設計，像一艘巨型方舟，被認為是北歐最美圖書館之一，作為慶祝獨立百年的文化地標，被譽為「21世紀圖書館典範」。這座建築以流線型木質結構設計，顛覆傳統，融合了咖啡廳、電影院、工作坊、圖書天堂等機能。" },
           { name: "聖殿廣場教堂", icon: "🪨", nav: "https://maps.app.goo.gl/eXecVQy5u5wsCkU1A", intro: "又稱岩石教堂，建於1969年，是由Suomalainen兄弟設計的現代建築奇蹟。它直接在市中心的一整塊天然岩石中炸穴開鑿而成，外部僅見淡藍色銅製圓形屋頂，內部則保留花崗岩原貌，上方有透明玻璃自然採光，音響效果極佳，是芬蘭著名的觀光景點。" },
           { name: "靜默教堂", icon: "⛪", nav: "https://maps.app.goo.gl/9wywyhyMLoCK9DNs8", intro: "位於康比廣場，為了維護內部寧靜，入口處設有管理，並有70人的人數限制。教堂外牆使用芬蘭雲杉木，呈現光滑溫暖的橢圓形大木碗或船形結構，完全無尖銳角落，象徵平靜。這座教堂被設計為一處現代人喧囂生活中的避難所，重點在於「安靜」與「心靈療癒」。它不舉辦結婚、洗禮等傳統儀式，僅供個人祈禱或冥想。" },
@@ -213,24 +278,41 @@
       const [records, setRecords] = useState([]);
       const [modal, setModal] = useState(null);
 
-      const [rate, setRate] = useState(35.5);
-      const [kpValue, setKpValue] = useState('—');
+      const [rate, setRate] = useState(35.5);        // ✅ number
+      const [kpValue, setKpValue] = useState('—');   // ✅ 先顯示佔位
 
       const [item, setItem] = useState('');
       const [amt, setAmt] = useState('');
       const [pay, setPay] = useState('💶現金');
       const [curr, setCurr] = useState('EUR');
 
-      // ✅ 行程滑動時自動收起上下（Header + 底部）
-      const [chromeHidden, setChromeHidden] = useState(false);
-      const lastScrollTopRef = useRef(0);
-
       const currDay = ITINERARY[day];
 
-      // ✅ 對應「天氣的最後一個地點」：抓當天 cities 最後一個（顯示城市名）
-      const kpCityName = (currDay?.cities && currDay.cities.length)
-        ? currDay.cities[currDay.cities.length - 1].n
-        : (currDay?.kpArea || "目前地點");
+      // ✅ 取「最後一個天氣地點」城市名（用 cities 最後一個）
+      const pickLastCityName = (dayObj) => {
+        if (dayObj?.cities?.length) return dayObj.cities[dayObj.cities.length - 1]?.n || dayObj.kpArea || "目前地點";
+        return dayObj?.kpArea || "目前地點";
+      };
+      const kpCityName = pickLastCityName(currDay);
+
+      // ✅ 鎖背景滾動：你滑「景點介紹彈窗」時，後面的卡片頁不動
+      const mainScrollRef = useRef(null);
+      const savedScrollTopRef = useRef(0);
+
+      useEffect(() => {
+        const el = mainScrollRef.current;
+        if (!el) return;
+
+        if (modal) {
+          savedScrollTopRef.current = el.scrollTop;
+          el.style.overflow = "hidden";
+          el.style.touchAction = "none"; // ✅ 手機最重要，防止背景被拖動
+        } else {
+          el.style.overflow = "auto";
+          el.style.touchAction = "auto";
+          el.scrollTop = savedScrollTopRef.current;
+        }
+      }, [modal]);
 
       // ✅ 匯率：只抓一次
       useEffect(() => {
@@ -243,7 +325,7 @@
           .catch(() => setRate(35.5));
       }, []);
 
-      // ✅ KP：NOAA 1m planetary K index（每 5 秒刷新）
+      // ✅ KP：抓 NOAA 最新值（每 5 秒刷新一次；切換 day 也會立即刷新一次）
       useEffect(() => {
         let alive = true;
 
@@ -261,25 +343,18 @@
               setKpValue('—');
             }
           } catch (e) {
-            // 失敗就不亂跳，保留原值
+            // 失敗就保持舊值
           }
         };
 
         fetchKp();
-        const timer = setInterval(fetchKp, 5000);
+        const timer = setInterval(fetchKp, 5 * 1000);
 
         return () => {
           alive = false;
           clearInterval(timer);
         };
       }, [day]);
-
-      // ✅ lucide icons：每次 view 變更也更新一下（避免某些手機偶發不出現）
-      useEffect(() => {
-        setTimeout(() => {
-          try { lucide.createIcons(); } catch (e) {}
-        }, 120);
-      }, [view, day]);
 
       const addRec = () => {
         if(!item || !amt) return;
@@ -294,36 +369,8 @@
         setAmt('');
       };
 
-      // ✅ 中間主內容捲動：往下滑就收起、往上滑就展開；回到頂端一定展開
-      const onMainScroll = (e) => {
-        if (view !== 'itinerary') return;
-
-        const el = e.currentTarget;
-        const st = el.scrollTop || 0;
-
-        // 回到頂端：一定展開
-        if (st <= 6) {
-          setChromeHidden(false);
-          lastScrollTopRef.current = st;
-          return;
-        }
-
-        const last = lastScrollTopRef.current || 0;
-        const delta = st - last;
-
-        // 小幅度抖動忽略
-        if (Math.abs(delta) < 8) return;
-
-        // 往下滑：收起
-        if (delta > 0) setChromeHidden(true);
-        // 往上滑：展開
-        if (delta < 0) setChromeHidden(false);
-
-        lastScrollTopRef.current = st;
-      };
-
       if (view === 'cover') return (
-        <div className="min-h-screen w-full relative flex items-center justify-center text-white overflow-hidden">
+        <div className="h-full w-full relative flex items-center justify-center text-white overflow-hidden">
           <img src="芬蘭.jpg" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-black/40" />
           <div className="z-10 text-center px-4">
@@ -334,16 +381,9 @@
       );
 
       return (
-        <div className="w-full min-h-screen flex flex-col bg-slate-50 relative overflow-hidden">
-          {/* Header（✅ 可收起） */}
-          <div
-            className="p-5 glass border-b flex justify-between items-center shrink-0 overflow-x-hidden"
-            style={{
-              transition: 'transform 220ms ease, opacity 220ms ease',
-              transform: (view==='itinerary' && chromeHidden) ? 'translateY(-110%)' : 'translateY(0)',
-              opacity: (view==='itinerary' && chromeHidden) ? 0.15 : 1
-            }}
-          >
+        <div className="w-full h-full flex flex-col bg-slate-50 relative overflow-hidden">
+          {/* Header */}
+          <div className="p-6 glass border-b flex justify-between items-center shrink-0 overflow-x-hidden">
             <div className="min-w-0">
               <h2 className="text-4xl font-black text-blue-900 italic underline decoration-blue-200">
                 {view === 'itinerary' ? `Day ${day+1}` :
@@ -356,12 +396,12 @@
             </div>
 
             {view === 'itinerary' && (
-              <div className="text-right space-y-2 shrink-0">
+              <div className="text-right space-y-3 shrink-0">
                 {currDay.cities.map(c => (
                   <button
                     key={c.n}
                     onClick={() => window.open(`https://www.google.com/search?q=${c.q}+weather`)}
-                    className="block text-base bg-sky-50 text-sky-600 px-4 py-2 rounded-full border border-sky-100 font-black italic underline"
+                    className="block text-lg bg-sky-50 text-sky-600 px-4 py-2 rounded-full border border-sky-100 font-black italic underline"
                   >
                     🌤️ {c.n}
                   </button>
@@ -370,49 +410,49 @@
             )}
           </div>
 
-          {/* Main Content（✅ 行程時捲動會收起上下） */}
+          {/* Main Content */}
           <div
-            className="flex-1 overflow-y-auto p-3 pb-[280px] overflow-x-hidden"
-            onScroll={onMainScroll}
+            ref={mainScrollRef}
+            className="flex-1 overflow-y-auto p-4 pb-[340px] overflow-x-hidden"
           >
             {view === 'itinerary' && (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {currDay.reminders && (
-                  <div className="bg-sky-100 text-sky-900 p-6 rounded-[34px] shadow-sm border-2 border-sky-200 overflow-x-hidden">
-                    <h3 className="text-xl font-black mb-3 flex items-center gap-2">📌 行前提醒</h3>
+                  <div className="bg-sky-100 text-sky-900 p-8 rounded-[45px] shadow-sm border-2 border-sky-200 overflow-x-hidden">
+                    <h3 className="text-2xl font-black mb-3 flex items-center gap-2">📌 行前提醒</h3>
                     {currDay.reminders.map((r, ri) => (
-                      <p key={ri} className="text-lg font-black italic opacity-90 leading-relaxed mb-1">・{r}</p>
+                      <p key={ri} className="text-xl font-black italic opacity-90 leading-relaxed mb-1">・{r}</p>
                     ))}
                   </div>
                 )}
 
-                {/* 行程卡片：標題完整；導航在標題下一行右側 */}
+                {/* ✅ 行程卡片：標題完整；導航在標題下一行右側 */}
                 {currDay.items.map((it, i) => (
                   <div key={i} className="item-card overflow-x-hidden">
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       <div className="min-w-0">
                         {it.time && (
-                          <div className="text-blue-500 font-black text-3xl mb-3 italic underline decoration-sky-100 underline-offset-8">
+                          <div className="text-blue-500 font-black text-4xl mb-4 italic underline decoration-sky-100 underline-offset-8">
                             {it.time}
                           </div>
                         )}
 
                         <span
                           onClick={() => setModal(it)}
-                          className="text-2xl font-black text-slate-700 cursor-pointer block leading-snug break-words"
+                          className="text-3xl font-black text-slate-700 cursor-pointer block leading-snug break-words"
                         >
                           {it.icon} {it.name.includes("住宿") && (
-                            <span className="bg-pink-100 text-pink-600 px-3 py-1 rounded-2xl mr-2 italic text-xl">住宿</span>
+                            <span className="bg-pink-100 text-pink-600 px-3 py-1 rounded-2xl mr-2 italic text-2xl">住宿</span>
                           )}
                           {it.name}
                         </span>
 
                         {(it.nav || (it.navs && it.navs.length)) && (
-                          <div className="mt-3 flex justify-end gap-3 flex-wrap">
+                          <div className="mt-4 flex justify-end gap-3 flex-wrap">
                             {it.nav && (
                               <button
                                 onClick={() => window.open(it.nav)}
-                                className="bg-blue-500 text-white px-5 py-2.5 rounded-2xl text-xl font-black btn-cute italic whitespace-nowrap flex items-center justify-center gap-2"
+                                className="bg-blue-500 text-white px-6 py-3 rounded-2xl text-2xl font-black btn-cute italic whitespace-nowrap flex items-center justify-center gap-2"
                               >
                                 <span aria-hidden="true">📍</span><span>導航</span>
                               </button>
@@ -421,7 +461,7 @@
                               <button
                                 key={ni}
                                 onClick={() => window.open(n.u)}
-                                className="bg-blue-500 text-white px-5 py-2.5 rounded-2xl text-xl font-black btn-cute italic whitespace-nowrap flex items-center justify-center gap-2"
+                                className="bg-blue-500 text-white px-6 py-3 rounded-2xl text-2xl font-black btn-cute italic whitespace-nowrap flex items-center justify-center gap-2"
                               >
                                 <span aria-hidden="true">📍</span><span>{n.l}</span>
                               </button>
@@ -433,16 +473,15 @@
                   </div>
                 ))}
 
-                {/* ✅ 上一天 / 下一天（縮小一點） */}
-                <div className="flex justify-between mt-8 mb-4 px-1">
+                <div className="flex justify-between mt-12 mb-8 px-2">
                   {day > 0
-                    ? <button onClick={() => setDay(day-1)} className="bg-white px-7 py-4 rounded-3xl border btn-cute font-black text-xl italic">← 上一天</button>
+                    ? <button onClick={() => setDay(day-1)} className="bg-white px-10 py-5 rounded-3xl border btn-cute font-black text-2xl italic">← 上一天</button>
                     : <div/>
                   }
 
                   {day < ITINERARY.length-1
-                    ? <button onClick={() => setDay(day+1)} className="bg-blue-600 text-white px-7 py-4 rounded-3xl btn-cute font-black text-xl italic">下一天 →</button>
-                    : <button onClick={() => setDay(0)} className="bg-green-500 text-white px-7 py-4 rounded-3xl btn-cute font-black text-xl italic">🔄 重啟</button>
+                    ? <button onClick={() => setDay(day+1)} className="bg-blue-600 text-white px-10 py-5 rounded-3xl btn-cute font-black text-2xl italic">下一天 →</button>
+                    : <button onClick={() => setDay(0)} className="bg-green-500 text-white px-10 py-5 rounded-3xl btn-cute font-black text-2xl italic">🔄 重啟</button>
                   }
                 </div>
               </div>
@@ -493,6 +532,7 @@
                   </button>
                 </div>
 
+                {/* ✅ 記帳卡片：支付方式第一行；金額+垃圾桶第二行 */}
                 {records.map(r => (
                   <div key={r.id} className="bg-white p-7 rounded-[45px] shadow-md border-l-[20px] border-blue-400 overflow-x-hidden">
                     <div className="font-black text-slate-800 text-3xl break-words">{r.item}</div>
@@ -523,6 +563,7 @@
                   </div>
                 ))}
 
+                {/* ✅ 總金額：縮小、一行顯示 NT$XXXX */}
                 <div className="bg-blue-900 text-white p-7 rounded-[40px] shadow-2xl mt-8 overflow-x-hidden">
                   <div className="flex items-center justify-between gap-4 flex-wrap">
                     <div className="text-base opacity-70 font-black italic">匯率預估: {rate}</div>
@@ -614,21 +655,14 @@
             )}
           </div>
 
-          {/* Bottom（✅ 可收起） */}
-          <div
-            className="shrink-0 absolute bottom-0 w-full z-40 overflow-x-hidden"
-            style={{
-              transition: 'transform 220ms ease, opacity 220ms ease',
-              transform: (view==='itinerary' && chromeHidden) ? 'translateY(110%)' : 'translateY(0)',
-              opacity: (view==='itinerary' && chromeHidden) ? 0.15 : 1
-            }}
-          >
-            {/* KP（字更小 + 圓角卡片，不擋按鈕） */}
+          {/* Bottom Nav */}
+          <div className="shrink-0 absolute bottom-0 w-full z-40 overflow-x-hidden">
+            {/* ✅ KP：字小；不擋上一天下一天；城市名用「天氣最後一個地點」 */}
             {view === 'itinerary' && (
               <div className="px-4 pt-3 pb-2">
                 <button
                   onClick={() => window.open(`https://www.swpc.noaa.gov/products/aurora-30-minute-forecast`)}
-                  className="w-full bg-blue-800 text-white py-3 text-sm font-black italic tracking-widest flex items-center justify-center gap-2 rounded-2xl shadow-xl border border-blue-700/30"
+                  className="w-full bg-blue-800 text-white py-4 text-base font-black italic tracking-widest flex items-center justify-center gap-3 rounded-2xl shadow-xl border border-blue-700/30"
                   title="點擊查看 NOAA 極光預測"
                 >
                   🌌 今日 {kpCityName} 極光 KP 值:
@@ -637,63 +671,61 @@
               </div>
             )}
 
-            <div className="h-24 glass border-t flex justify-around items-center px-4 pb-5">
+            <div className="h-28 glass border-t flex justify-around items-center px-4 pb-6">
               <button onClick={()=>setView('itinerary')} className={`flex flex-col items-center gap-1 ${view==='itinerary'?'text-blue-600 scale-125 font-black italic':'text-slate-300'}`}>
-                <i data-lucide="calendar" size={30}></i><span className="text-sm font-black">行程</span>
+                <i data-lucide="calendar" size={32}></i><span className="text-base font-black">行程</span>
               </button>
               <button onClick={()=>setView('budget')} className={`flex flex-col items-center gap-1 ${view==='budget'?'text-blue-600 scale-125 font-black italic':'text-slate-300'}`}>
-                <i data-lucide="piggy-bank" size={30}></i><span className="text-sm font-black">記帳</span>
+                <i data-lucide="piggy-bank" size={32}></i><span className="text-base font-black">記帳</span>
               </button>
               <button onClick={()=>setView('notice')} className={`flex flex-col items-center gap-1 ${view==='notice'?'text-blue-600 scale-125 font-black italic':'text-slate-300'}`}>
-                <i data-lucide="info" size={30}></i><span className="text-sm font-black">注意</span>
+                <i data-lucide="info" size={32}></i><span className="text-base font-black">注意</span>
               </button>
               <button onClick={()=>setView('tax')} className={`flex flex-col items-center gap-1 ${view==='tax'?'text-blue-600 scale-125 font-black italic':'text-slate-300'}`}>
-                <i data-lucide="receipt" size={30}></i><span className="text-sm font-black">退稅</span>
+                <i data-lucide="receipt" size={32}></i><span className="text-base font-black">退稅</span>
               </button>
             </div>
           </div>
 
-          {/* ✅ Modal：修正 CLOSE 一定可見（內容區捲動 + 底部固定按鈕） */}
+          {/* ✅ Modal：absolute，且「只滾彈窗」，背景不動 */}
           {modal && (
             <div
               className="absolute inset-0 z-[60] bg-black/70 flex items-center justify-center p-4"
               onClick={()=>setModal(null)}
+              onWheel={(e)=>e.stopPropagation()}
+              onTouchMove={(e)=>e.stopPropagation()}
             >
               <div
-                className="bg-white w-full rounded-[55px] shadow-2xl overflow-hidden flex flex-col"
+                className="bg-white w-full rounded-[55px] p-8 shadow-2xl overflow-hidden overscroll-contain"
                 style={{ maxHeight: '86%', maxWidth: '96%' }}
                 onClick={e=>e.stopPropagation()}
+                onWheel={(e)=>e.stopPropagation()}
+                onTouchMove={(e)=>e.stopPropagation()}
               >
-                <div className="p-7 pb-4">
-                  <h3 className="text-3xl font-black text-blue-900 italic underline decoration-yellow-200 underline-offset-8 leading-snug break-words">
-                    {modal.name}
-                  </h3>
-                </div>
+                <h3 className="text-4xl font-black mb-6 text-blue-900 italic underline decoration-yellow-200 underline-offset-8 leading-snug break-words">
+                  {modal.name}
+                </h3>
 
-                {/* ✅ 內容區：可捲動，不會把 CLOSE 擠掉 */}
-                <div className="flex-1 overflow-y-auto px-7 pb-6 intro-scroll space-y-6 text-slate-600">
+                <div className="intro-scroll space-y-6 text-slate-600">
                   {modal.transport && (
-                    <div className="p-6 bg-sky-50 rounded-[34px] border-4 border-sky-100 text-sky-800 text-xl font-black italic leading-relaxed break-words">
+                    <div className="p-6 bg-sky-50 rounded-[40px] border-4 border-sky-100 text-sky-800 text-2xl font-black italic leading-relaxed break-words">
                       💡 教學：<br/>{modal.transport}
                     </div>
                   )}
                   {modal.detail && (
-                    <div className="text-lg font-black text-slate-400 border-b-4 pb-4 italic uppercase tracking-widest leading-loose break-words">
+                    <div className="text-xl font-black text-slate-400 border-b-4 pb-4 italic uppercase tracking-widest leading-loose break-words">
                       詳情：<br/>{modal.detail}
                     </div>
                   )}
                   <p className="font-black italic whitespace-pre-wrap leading-loose break-words">{modal.intro}</p>
                 </div>
 
-                {/* ✅ CLOSE：永遠在底部可見 */}
-                <div className="p-6 pt-4 border-t bg-white">
-                  <button
-                    onClick={() => setModal(null)}
-                    className="w-full py-4 bg-slate-100 rounded-[28px] font-black text-slate-500 uppercase btn-cute text-2xl italic"
-                  >
-                    CLOSE
-                  </button>
-                </div>
+                <button
+                  onClick={() => setModal(null)}
+                  className="mt-6 w-full py-5 bg-slate-100 rounded-[32px] font-black text-slate-500 uppercase btn-cute text-3xl italic"
+                >
+                  CLOSE
+                </button>
               </div>
             </div>
           )}
@@ -703,6 +735,7 @@
 
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<App />);
+    setTimeout(() => lucide.createIcons(), 200);
   </script>
 
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>

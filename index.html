@@ -35,6 +35,24 @@
     #root { height: 100%; }
     #root > * { height: 100%; }
 
+    /* ✅ 手機實際使用：置中 + 不會跑版（桌機看也漂亮） */
+    .app-outer{
+      min-height: 100vh;
+      display:flex;
+      justify-content:center;
+      align-items:stretch;
+      padding: 0;
+      background: radial-gradient(1200px 600px at 50% 0%, #dbeafe 0%, #eef2ff 55%, #f8fafc 100%);
+    }
+    .app-shell{
+      width: 100%;
+      max-width: 460px;  /* ✅ S23U 看起來不會太寬，桌機也能像手機 */
+      height: 100vh;     /* ✅ 手機直接滿版 */
+      background: #ffffff;
+      position: relative;
+      overflow: hidden; /* ✅ UI 不會跑出邊界 */
+    }
+
     .glass { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(15px); }
     .btn-cute { transition: all 0.2s; box-shadow: 0 5px 0 #93c5fd; border: 2px solid #bfdbfe; }
     .btn-cute:active { transform: translateY(3px); box-shadow: 0 2px 0 #93c5fd; }
@@ -48,6 +66,7 @@
       padding-right: 10px;
       overflow-x: hidden;
       word-break: break-word;
+      padding-bottom: 24px; /* ✅ 最下面字不會被擋 */
     }
     .item-card { background: white; border-radius: 40px; padding: 1.8rem; margin-bottom: 1.5rem; border: 2px solid #f1f5f9; }
     .info-card {
@@ -63,55 +82,59 @@
     .intro-scroll::-webkit-scrollbar { width: 4px; }
     .intro-scroll::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
 
-    /* ✅ 收起/展開動畫用 */
-    .ui-slide {
-      transition: transform 220ms ease, opacity 220ms ease;
-      will-change: transform;
-    }
-    .ui-hide {
-      transform: translateY(-120%);
-      opacity: 0;
-      pointer-events: none;
-    }
-    .ui-bottom-hide {
-      transform: translateY(120%);
-      opacity: 0;
-      pointer-events: none;
+    /* ✅ Header / Bottom 收起動畫 */
+    .ui-slide { transition: transform .22s ease, opacity .22s ease; will-change: transform; }
+    .ui-hide { transform: translateY(-110%); opacity: 0; pointer-events: none; }
+
+    .bottom-hide { transform: translateY(110%); opacity: 0; pointer-events: none; }
+
+    /* ✅ iOS 安全區 */
+    .safe-bottom{
+      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.75rem);
     }
 
-    /* ✅ Modal 內部布局：確保 CLOSE 永遠可見 + 內容不被擋 */
-    .modal-card {
-      display: flex;
-      flex-direction: column;
-      max-height: 86%;
+    /* ✅ Modal：讓 CLOSE 永遠可見，不會被擋 */
+    .modal-wrap{
+      position:absolute; inset:0;
+      z-index: 60;
+      background: rgba(0,0,0,0.7);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 16px;
+    }
+    .modal-card{
+      background:#fff;
+      width: 100%;
       max-width: 96%;
-      overflow: hidden;
       border-radius: 55px;
+      padding: 32px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+      display:flex;
+      flex-direction:column;
+      max-height: 86%;
+      overflow:hidden;
     }
-    .modal-scroll {
-      overflow-y: auto;
-      overflow-x: hidden;
+    .modal-body{
+      overflow-y:auto;
+      overflow-x:hidden;
+      padding-right: 10px;
+      padding-bottom: 18px; /* ✅ 底部留白 */
+      -webkit-overflow-scrolling: touch;
       word-break: break-word;
-      padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)); /* ✅ 預留底部按鈕高度 */
-    }
-    .modal-scroll::-webkit-scrollbar { width: 4px; }
-    .modal-scroll::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
-    .modal-close-sticky {
-      position: sticky;
-      bottom: 0;
-      background: white;
-      padding-top: 12px;
-      padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
-      z-index: 5;
     }
   </style>
 </head>
 
 <body>
-  <div id="root"></div>
+  <div class="app-outer">
+    <div class="app-shell">
+      <div id="root"></div>
+    </div>
+  </div>
 
   <script type="text/babel">
-    const { useState, useEffect, useRef } = React;
+    const { useState, useEffect, useRef, useLayoutEffect } = React;
 
     const ITINERARY = [
       {
@@ -258,21 +281,21 @@
       const [pay, setPay] = useState('💶現金');
       const [curr, setCurr] = useState('EUR');
 
-      // ✅ 滑動時自動收起上下
-      const mainRef = useRef(null);
-      const lastScrollRef = useRef(0);
-      const hideTimerRef = useRef(null);
       const [hideUI, setHideUI] = useState(false);
+
+      const headerRef = useRef(null);
+      const bottomRef = useRef(null);
+      const mainRef = useRef(null);
+
+      const [headerH, setHeaderH] = useState(150);
+      const [bottomH, setBottomH] = useState(140);
 
       const currDay = ITINERARY[day];
 
-      // ✅ 取「最後一個天氣城市」（對應 cities 最後一個）
-      const getLastCityNameForKp = (dayObj) => {
-        if (!dayObj) return "目前地點";
-        if (dayObj?.cities?.length) return dayObj.cities[dayObj.cities.length - 1].n;
-        return dayObj.kpArea || "目前地點";
-      };
-      const kpCityName = getLastCityNameForKp(currDay);
+      // ✅ KPI 顯示：對應「天氣按鈕」最後一個城市名稱
+      const lastCityName = (currDay?.cities && currDay.cities.length)
+        ? currDay.cities[currDay.cities.length - 1].n
+        : (currDay?.kpArea || "目前地點");
 
       // ✅ 匯率：只抓一次
       useEffect(() => {
@@ -285,7 +308,7 @@
           .catch(() => setRate(35.5));
       }, []);
 
-      // ✅ KP：NOAA 1m 最新值；每 5 秒刷新
+      // ✅ KP：抓 NOAA 最新值（5秒更新），切換 day 也會立刻刷新
       useEffect(() => {
         let alive = true;
 
@@ -303,7 +326,7 @@
               setKpValue('—');
             }
           } catch (e) {
-            if (!alive) return;
+            // 失敗就不亂跳
           }
         };
 
@@ -315,11 +338,6 @@
           clearInterval(timer);
         };
       }, [day]);
-
-      // ✅ Lucide icons refresh
-      useEffect(() => {
-        setTimeout(() => lucide.createIcons(), 100);
-      });
 
       const addRec = () => {
         if(!item || !amt) return;
@@ -334,34 +352,54 @@
         setAmt('');
       };
 
-      // ✅ 滑動處理：往下滑 -> 隱藏；停一下或往上 -> 顯示
-      const onMainScroll = (e) => {
-        const el = e.currentTarget;
-        const st = el.scrollTop;
-        const last = lastScrollRef.current;
-        const delta = st - last;
+      // ✅ 量測 Header / Bottom 高度（讓收起後「中間真的變大」）
+      useLayoutEffect(() => {
+        const measure = () => {
+          if (headerRef.current) setHeaderH(Math.max(120, headerRef.current.getBoundingClientRect().height));
+          if (bottomRef.current) setBottomH(Math.max(110, bottomRef.current.getBoundingClientRect().height));
+        };
+        measure();
+        window.addEventListener('resize', measure);
+        return () => window.removeEventListener('resize', measure);
+      }, [view, day, records.length]);
 
-        // 避免在最頂端就硬收起
-        const nearTop = st < 10;
-
-        if (!nearTop && delta > 6) {
-          setHideUI(true);
-          if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
-          hideTimerRef.current = setTimeout(() => {
-            // 停止滑動一段時間再自動顯示一點點（但我們這邊保持縮起，避免擋視線）
-          }, 500);
-        } else if (delta < -6 || nearTop) {
-          setHideUI(false);
-        }
-
-        lastScrollRef.current = st;
-      };
-
-      // ✅ 每次切換 view/day 都把 UI 展開，避免卡在隱藏狀態
+      // ✅ Scroll：下滑收起，上滑顯示
       useEffect(() => {
-        setHideUI(false);
-        if (mainRef.current) mainRef.current.scrollTop = 0;
+        const el = mainRef.current;
+        if (!el) return;
+
+        let lastTop = el.scrollTop || 0;
+        let ticking = false;
+
+        const onScroll = () => {
+          const top = el.scrollTop || 0;
+          const delta = top - lastTop;
+
+          if (ticking) return;
+          ticking = true;
+
+          requestAnimationFrame(() => {
+            // 下滑：收起（要滑一定距離才收）
+            if (delta > 10 && top > 60) setHideUI(true);
+            // 上滑：展開
+            if (delta < -10) setHideUI(false);
+
+            lastTop = top;
+            ticking = false;
+          });
+        };
+
+        el.addEventListener('scroll', onScroll, { passive: true });
+        return () => el.removeEventListener('scroll', onScroll);
       }, [view, day]);
+
+      // ✅ lucide icons 重繪（切換 view / day / 記帳新增刪除）
+      useEffect(() => {
+        const t = setTimeout(() => {
+          try { lucide.createIcons(); } catch(e) {}
+        }, 60);
+        return () => clearTimeout(t);
+      }, [view, day, records.length]);
 
       if (view === 'cover') return (
         <div className="h-full w-full relative flex items-center justify-center text-white overflow-hidden">
@@ -381,15 +419,18 @@
         </div>
       );
 
-      // ✅ 底部區塊高度（KP + Nav）
-      const bottomHeight = (view === 'itinerary')
-        ? (hideUI ? 120 : 220)  // 隱藏時給少一點 padding，避免空白太大
-        : (hideUI ? 110 : 160);
+      // ✅ Header：absolute（不佔版面，收起中間才會變大）
+      // ✅ Main：用 paddingTop / paddingBottom 預留空間
+      const headerPad = hideUI ? 16 : headerH;
+      const bottomPad = hideUI ? 16 : bottomH;
 
       return (
         <div className="w-full h-full flex flex-col bg-slate-50 relative overflow-hidden">
-          {/* Header（會收起） */}
-          <div className={`p-6 glass border-b flex justify-between items-center shrink-0 overflow-x-hidden ui-slide ${hideUI ? 'ui-hide' : ''}`}>
+          {/* Header */}
+          <div
+            ref={headerRef}
+            className={`absolute top-0 left-0 right-0 z-50 p-6 glass border-b flex justify-between items-center overflow-x-hidden ui-slide ${hideUI ? 'ui-hide' : ''}`}
+          >
             <div className="min-w-0">
               <h2 className="text-4xl font-black text-blue-900 italic underline decoration-blue-200">
                 {view === 'itinerary' ? `Day ${day+1}` :
@@ -416,12 +457,14 @@
             )}
           </div>
 
-          {/* Main Content（綁 onScroll 來收起上下） */}
+          {/* Main Content */}
           <div
             ref={mainRef}
-            onScroll={onMainScroll}
             className="flex-1 overflow-y-auto p-4 overflow-x-hidden"
-            style={{ paddingBottom: `${bottomHeight}px` }}
+            style={{
+              paddingTop: `${headerPad}px`,
+              paddingBottom: `${bottomPad}px`,
+            }}
           >
             {view === 'itinerary' && (
               <div className="space-y-6">
@@ -434,26 +477,28 @@
                   </div>
                 )}
 
-                {/* 行程卡片：標題完整；導航在標題下一行右側 */}
+                {/* ✅ 行程卡片：標題完整；導航在標題下一行右側 */}
                 {currDay.items.map((it, i) => (
                   <div key={i} className="item-card overflow-x-hidden">
-                    <div className="space-y-4">
-                      <div className="min-w-0">
-                        {it.time && (
-                          <div className="text-blue-500 font-black text-4xl mb-4 italic underline decoration-sky-100 underline-offset-8">
-                            {it.time}
-                          </div>
-                        )}
+                    {it.time && (
+                      <div className="text-blue-500 font-black text-4xl mb-4 italic underline decoration-sky-100 underline-offset-8">
+                        {it.time}
+                      </div>
+                    )}
 
-                        <span
+                    <div className="flex items-start gap-4">
+                      <div className="shrink-0 text-4xl leading-none" aria-hidden="true">{it.icon}</div>
+
+                      <div className="flex-1 min-w-0">
+                        <div
                           onClick={() => setModal(it)}
-                          className="text-3xl font-black text-slate-700 cursor-pointer block leading-snug break-words"
+                          className="text-3xl font-black text-slate-700 cursor-pointer leading-snug break-words"
                         >
-                          {it.icon} {it.name.includes("住宿") && (
+                          {it.name && it.name.includes("住宿") && (
                             <span className="bg-pink-100 text-pink-600 px-3 py-1 rounded-2xl mr-2 italic text-2xl">住宿</span>
                           )}
                           {it.name}
-                        </span>
+                        </div>
 
                         {(it.nav || (it.navs && it.navs.length)) && (
                           <div className="mt-4 flex justify-end gap-3 flex-wrap">
@@ -481,6 +526,7 @@
                   </div>
                 ))}
 
+                {/* ✅ 上/下一天（整體更小一點） */}
                 <div className="flex justify-between mt-10 mb-6 px-2">
                   {day > 0
                     ? <button onClick={() => setDay(day-1)} className="bg-white px-8 py-4 rounded-3xl border btn-cute font-black text-xl italic">← 上一天</button>
@@ -540,6 +586,7 @@
                   </button>
                 </div>
 
+                {/* ✅ 記帳卡片：支付方式第一行；金額+垃圾桶第二行 */}
                 {records.map(r => (
                   <div key={r.id} className="bg-white p-7 rounded-[45px] shadow-md border-l-[20px] border-blue-400 overflow-x-hidden">
                     <div className="font-black text-slate-800 text-3xl break-words">{r.item}</div>
@@ -570,12 +617,11 @@
                   </div>
                 ))}
 
+                {/* ✅ 總金額：縮小、一行顯示 NT$XXXX */}
                 <div className="bg-blue-900 text-white p-7 rounded-[40px] shadow-2xl mt-8 overflow-x-hidden">
                   <div className="flex items-center justify-between gap-4 flex-wrap">
                     <div className="text-base opacity-70 font-black italic">匯率預估: {rate}</div>
-                    <div className="text-2xl font-black italic underline decoration-sky-400 underline-offset-4">
-                      總計
-                    </div>
+                    <div className="text-2xl font-black italic underline decoration-sky-400 underline-offset-4">總計</div>
                     <div className="text-3xl font-black tracking-tight whitespace-nowrap">
                       NT$ {Math.round(records.reduce((s,r)=>s + (Number(r.twd) || 0), 0)).toLocaleString()}
                     </div>
@@ -661,22 +707,26 @@
             )}
           </div>
 
-          {/* Bottom（會收起）：KP + Nav */}
-          <div className={`shrink-0 absolute bottom-0 w-full z-40 overflow-x-hidden ui-slide ${hideUI ? 'ui-bottom-hide' : ''}`}>
+          {/* Bottom Nav */}
+          <div
+            ref={bottomRef}
+            className={`absolute bottom-0 left-0 right-0 z-40 overflow-x-hidden ui-slide ${hideUI ? 'bottom-hide' : ''}`}
+          >
+            {/* ✅ KP：城市名字（對應天氣最後一個城市）＋ NOAA KP；字小；不擋上一天下一天 */}
             {view === 'itinerary' && (
               <div className="px-4 pt-3 pb-2">
                 <button
                   onClick={() => window.open(`https://www.swpc.noaa.gov/products/aurora-30-minute-forecast`)}
-                  className="w-full bg-blue-800 text-white py-4 text-base font-black italic tracking-widest flex items-center justify-center gap-3 rounded-2xl shadow-xl border border-blue-700/30"
+                  className="w-full bg-blue-800 text-white py-3 text-sm font-black italic tracking-widest flex items-center justify-center gap-2 rounded-2xl shadow-xl border border-blue-700/30"
                   title="點擊查看 NOAA 極光預測"
                 >
-                  🌌 今日 {kpCityName} 極光 KP 值:
+                  🌌 今日 {lastCityName} 極光 KP 值:
                   <span className="text-green-300 text-sm">{kpValue}</span>
                 </button>
               </div>
             )}
 
-            <div className="h-28 glass border-t flex justify-around items-center px-4 pb-6">
+            <div className="h-28 glass border-t flex justify-around items-center px-4 safe-bottom">
               <button onClick={()=>setView('itinerary')} className={`flex flex-col items-center gap-1 ${view==='itinerary'?'text-blue-600 scale-125 font-black italic':'text-slate-300'}`}>
                 <i data-lucide="calendar" size={32}></i><span className="text-base font-black">行程</span>
               </button>
@@ -692,49 +742,34 @@
             </div>
           </div>
 
-          {/* ✅ Modal：CLOSE 永遠可見 + 內容底部不被擋 */}
+          {/* ✅ Modal：CLOSE 永遠存在 + 內容底部不被擋 */}
           {modal && (
-            <div
-              className="absolute inset-0 z-[60] bg-black/70 flex items-center justify-center p-4"
-              onClick={()=>setModal(null)}
-            >
-              <div
-                className="bg-white w-full shadow-2xl modal-card"
-                onClick={e=>e.stopPropagation()}
-              >
-                <div className="p-8 pb-4">
-                  <h3 className="text-4xl font-black text-blue-900 italic underline decoration-yellow-200 underline-offset-8 leading-snug break-words">
-                    {modal.name}
-                  </h3>
+            <div className="modal-wrap" onClick={()=>setModal(null)}>
+              <div className="modal-card" onClick={e=>e.stopPropagation()}>
+                <h3 className="text-4xl font-black mb-6 text-blue-900 italic underline decoration-yellow-200 underline-offset-8 leading-snug break-words">
+                  {modal.name}
+                </h3>
+
+                <div className="modal-body intro-scroll text-slate-600">
+                  {modal.transport && (
+                    <div className="p-6 bg-sky-50 rounded-[40px] border-4 border-sky-100 text-sky-800 text-2xl font-black italic leading-relaxed break-words mb-6">
+                      💡 教學：<br/>{modal.transport}
+                    </div>
+                  )}
+                  {modal.detail && (
+                    <div className="text-xl font-black text-slate-400 border-b-4 pb-4 italic uppercase tracking-widest leading-loose break-words mb-6">
+                      詳情：<br/>{modal.detail}
+                    </div>
+                  )}
+                  <p className="font-black italic whitespace-pre-wrap leading-loose break-words">{modal.intro}</p>
                 </div>
 
-                <div className="modal-scroll px-8">
-                  <div className="space-y-6 text-slate-600" style={{ fontSize: '1.5rem', lineHeight: '2.3', fontWeight: 'bold' }}>
-                    {modal.transport && (
-                      <div className="p-6 bg-sky-50 rounded-[40px] border-4 border-sky-100 text-sky-800 text-2xl font-black italic leading-relaxed break-words">
-                        💡 教學：<br/>{modal.transport}
-                      </div>
-                    )}
-                    {modal.detail && (
-                      <div className="text-xl font-black text-slate-400 border-b-4 pb-4 italic uppercase tracking-widest leading-loose break-words">
-                        詳情：<br/>{modal.detail}
-                      </div>
-                    )}
-                    <p className="font-black italic whitespace-pre-wrap leading-loose break-words">{modal.intro}</p>
-                  </div>
-
-                  {/* ✅ 這段是保險：就算某些手機 sticky 行為怪，也會留空間 */}
-                  <div style={{ height: '24px' }}></div>
-                </div>
-
-                <div className="modal-close-sticky px-8">
-                  <button
-                    onClick={() => setModal(null)}
-                    className="w-full py-5 bg-slate-100 rounded-[32px] font-black text-slate-500 uppercase btn-cute text-3xl italic"
-                  >
-                    CLOSE
-                  </button>
-                </div>
+                <button
+                  onClick={() => setModal(null)}
+                  className="mt-6 w-full py-5 bg-slate-100 rounded-[32px] font-black text-slate-500 uppercase btn-cute text-3xl italic"
+                >
+                  CLOSE
+                </button>
               </div>
             </div>
           )}
@@ -744,6 +779,7 @@
 
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<App />);
+    setTimeout(() => { try { lucide.createIcons(); } catch(e) {} }, 120);
   </script>
 
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>

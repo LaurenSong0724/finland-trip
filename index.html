@@ -30,7 +30,6 @@
       user-select: none;
       line-height: 1.8;
       color: #1e293b;
-
       overflow: hidden;
     }
 
@@ -65,20 +64,18 @@
     .btn-cute { transition: all 0.2s; box-shadow: 0 5px 0 #93c5fd; border: 2px solid #bfdbfe; }
     .btn-cute:active { transform: translateY(3px); box-shadow: 0 2px 0 #93c5fd; }
 
-    /* ✅ 讓 modal 內文不擠：把原本 intro-scroll 的 max-height 拿掉，交給 modal-body 自己撐 */
     .intro-scroll {
       font-size: 1.5rem;
       line-height: 2.3;
       font-weight: bold;
       overflow-y: auto;
-      /* max-height: 58vh;  ❌拿掉，避免彈窗擁擠 */
+      max-height: 62vh;
       padding-right: 10px;
       overflow-x: hidden;
       word-break: break-word;
       padding-bottom: 24px;
       -webkit-overflow-scrolling: touch;
     }
-
     .item-card { background: white; border-radius: 40px; padding: 1.8rem; margin-bottom: 1.5rem; border: 2px solid #f1f5f9; }
     .info-card {
       background: white;
@@ -110,7 +107,6 @@
       justify-content:center;
       padding: 16px;
     }
-    /* ✅ 彈窗高度再長一點 */
     .modal-card{
       background:#fff;
       width: 100%;
@@ -120,16 +116,10 @@
       box-shadow: 0 24px 60px rgba(0,0,0,0.25);
       display:flex;
       flex-direction:column;
-      max-height: 92%;
+      max-height: 88%;
       overflow:hidden;
     }
-    @supports (height: 100dvh){
-      .modal-card{ max-height: 92dvh; }
-    }
-
-    /* ✅ 內文區用 flex 撐滿剩餘高度，視覺更舒服 */
     .modal-body{
-      flex: 1;
       overflow-y:auto;
       overflow-x:hidden;
       padding-right: 10px;
@@ -137,18 +127,6 @@
       -webkit-overflow-scrolling: touch;
       word-break: break-word;
     }
-
-    /* ✅ 透明手勢區（只有 hideUI 時才會顯示） */
-    .reveal-zone{
-      position: absolute;
-      left: 0; right: 0;
-      z-index: 55;
-      background: transparent;
-      pointer-events: auto;
-      touch-action: pan-y;
-    }
-    .reveal-zone.top{ top: 0; height: 56px; }
-    .reveal-zone.bottom{ bottom: 0; height: 72px; }
   </style>
 </head>
 
@@ -176,12 +154,16 @@
           { time: "15:25", name: "ICN 抵達(首爾仁川國際機場第2航廈)", icon: "🇰🇷",
             intro: "仁川國際機場不僅是轉機樞紐，本身就是熱門景點。航廈內擁有數位體驗與藝術展示，有多處綠植造景的室內花園，傳統文化體驗中心，提供免費的傳統手工藝DIY和文化表演，以及第2航廈的觀景台可近距離觀看飛機起降"
           },
-          { time: "16:10", name: "從仁川到寄放行李", icon: "🧳",
+
+          { time: "16:10", name: "從仁川機場寄放行李", icon: "🧳",
             transport: "1.「T-Locker」無人智能儲物櫃位於1樓3號出口、3樓4號出口附近\n2.「T-Luggage」人工櫃檯位於 3 樓出境大廳 H 櫃檯對面，亦有 Zimzero 等合作業者提供服務(3樓4號出口附近)"
           },
+
           { time: "16:55", name: "從仁川到弘大", icon: "🚇",
-            transport: "建議搭乘 AREX（機場快線）前往「Hongik University Station」，通常最快、最省心。若要更快可選直達列車到首爾站後再轉乘地鐵，但帶行李轉乘會較麻煩。"
+            highlight: "認準「一般列車」（All-stop Train），不能搭乘「直通車」（Express Train）",
+            transport: "從仁川機場第2航廈前往弘大，最快方式是搭乘機場快線AREX普通車，搭乘位置在地下一樓轉乘中心「機場鐵道」處 ，可以現場購買單程票，或是在進站閘口旁邊，有販售T-money交通卡的機器，用T-money交通卡刷卡進站"
           },
+
           { time: "17:55", name: "Hongik University Station", icon: "🎨",
             intro: "弘大位於首爾的麻浦區，是年輕人和潮流愛好者的天堂，因周圍的弘益大學而得名。白天的弘大充滿藝術氣息，街頭藝人的表演、壁畫小巷的創意塗鴉隨處可見；夜晚則變身活力四射的派對聖地，無論是想感受韓國潮流文化，還是尋找獨特的旅行體驗，弘大都是遊客不容錯過的目的地"
           },
@@ -198,16 +180,20 @@
           { time: "19:45", name: "弘大畢卡索街", icon: "🖼️", nav: "https://naver.me/5DZUKipz",
             intro: "位於首爾弘益大學校園旁，是一條以特色塗鴉、創意彩繪牆及藝術氛圍聞名的巷弄。這裡由弘大學生和當地居民共同創作，處處充滿童趣與年輕氣息，也是韓劇《沒關係，是愛情啊》、《瑪莉外宿中》等熱門劇集的經典取景地"
           },
-          { time: "20:20", name: "午餐吃豬肉湯飯-屋同食Okdongsik", icon: "🍲", nav: "https://naver.me/FqHt4PxE",
+
+          { time: "20:20", name: "晚餐吃豬肉湯飯-屋同食Okdongsik", icon: "🍲", nav: "https://naver.me/FqHt4PxE",
             intro: "由黑湯匙大廚玉東植經營的知名豬肉湯飯餐廳，以「去紐約的豬肉湯」之名在《黑白大廚2》中展現驚人實力。該店連續多年獲米其林必比登推薦，其特色為使用豬肉長時間熬煮的清澈湯頭，風格清淡、不油膩"
           },
+
           { time: "21:10", name: "哈莫妮超市Harmony Mart弘大店", icon: "🛒", nav: "https://naver.me/GWr2dZLq",
             intro: "採買辛拉麵跟起司泡麵"
           },
+
           { time: "21:35", name: "從弘大回仁川機場", icon: "🚇", nav: "https://naver.me/5vYH2mKl",
-            intro: "有教學列出怎麼坐車回去仁川機場",
-            transport: "建議搭乘 AREX（機場快線）從 Hongik University Station 返回仁川機場。若時間緊迫，請預留進出站與航廈步行時間。"
+            highlight: "認準「一般列車」（All-stop Train），不能搭乘「直通車」（Express Train）",
+            transport: "從弘大前往仁川機場第2航廈，最快方式是於弘大入口站搭乘機場快線AREX普通車"
           },
+
           { time: "22:35", name: "拿寄放的行李", icon: "🎒" },
           { time: "23:00", name: "AY042 芬蘭航空 首爾 ✈️ 赫爾辛基", icon: "✈️", type: "flight",
             detail: "23:00搭乘芬蘭航空出發(首爾仁川國際機場第1航廈)→HEL 05:40抵達芬蘭赫爾辛基萬塔機場",
@@ -216,6 +202,9 @@
           }
         ]
       },
+
+      /* ======= 以下芬蘭行程（保持原樣） ======= */
+
       {
         date: "3/11",
         title: "赫爾辛基 🇫🇮",
@@ -587,8 +576,10 @@
 
       const [item, setItem] = useState('');
       const [amt, setAmt] = useState('');
-      const [pay, setPay] = useState('💶現金');
-      const [curr, setCurr] = useState('EUR');
+
+      // ✅ 改：預設顯示「幣別 / 支付方式」，點選才看到選項
+      const [pay, setPay] = useState('PAY');
+      const [curr, setCurr] = useState('CURR');
 
       const [hideUI, setHideUI] = useState(false);
 
@@ -602,12 +593,9 @@
       const [headerH, setHeaderH] = useState(150);
       const [bottomH, setBottomH] = useState(140);
 
-      /* ✅ 支付方式選擇彈窗 */
-      const [payPickerOpen, setPayPickerOpen] = useState(false);
-
-      /* ✅ 手勢偵測 */
-      const touchStartYRef = useRef(null);
-      const touchStartAtRef = useRef(null); // 'top' | 'bottom' | null
+      // ✅ Samsung Internet 友善：在主捲動區偵測「上緣下滑 / 下緣上滑」叫回 UI
+      const touchStartYRef2 = useRef(null);
+      const touchStartZoneRef = useRef(null); // 'top' | 'bottom' | null
 
       const currDay = ITINERARY[day];
 
@@ -665,8 +653,12 @@
         const amount = Number(amt);
         if (!Number.isFinite(amount)) return;
 
-        const twdVal = (curr === 'EUR') ? (amount * Number(rate)) : amount;
-        const r = { id: Date.now(), item, amt: amount, pay, curr, twd: twdVal };
+        const usingCurr = (curr === 'CURR') ? 'EUR' : curr;
+        const twdVal = (usingCurr === 'EUR') ? (amount * Number(rate)) : amount;
+
+        const usingPay = (pay === 'PAY') ? '💶現金' : pay;
+
+        const r = { id: Date.now(), item, amt: amount, pay: usingPay, curr: usingCurr, twd: twdVal };
 
         setRecords([r, ...records]);
         setItem('');
@@ -694,78 +686,89 @@
         setBottomH(Math.max(110, Math.round(b0)));
 
         return () => ro.disconnect();
-      }, [view, day, records.length, hideUI]);
+      }, [view, day, records.length]);
 
-      /* ✅ 新版：在中間就固定隱藏，除非你在「上/下透明區」做指定方向手勢才顯示 */
+      // ✅ 你要的：在看中間行程時就藏 UI，不要一直跑出來
+      // 只有你在「螢幕最上緣往下滑」或「螢幕最下緣往上滑」才叫回 UI
       const TOP_ZONE = 44;
+
+      const onMainPointerDown = () => {
+        const el = mainRef.current;
+        if (!el) return;
+        const top = el.scrollTop || 0;
+
+        if (top <= TOP_ZONE) {
+          setHideUI(false);
+          return;
+        }
+        setHideUI(true);
+      };
+
+      // ✅ Samsung Internet：主捲動區的 touch 手勢偵測
+      const EDGE_TOP = 70;
+      const EDGE_BOTTOM = 90;
+      const SWIPE_TRIGGER = 28;
+
+      const detectEdgeZone = (clientY) => {
+        const vh = window.innerHeight || 0;
+        if (clientY <= EDGE_TOP) return 'top';
+        if (vh - clientY <= EDGE_BOTTOM) return 'bottom';
+        return null;
+      };
+
+      const onMainTouchStart = (e) => {
+        if (!hideUI) return;
+        const t = e.touches && e.touches[0];
+        if (!t) return;
+        touchStartYRef2.current = t.clientY;
+        touchStartZoneRef.current = detectEdgeZone(t.clientY);
+      };
+
+      const onMainTouchEnd = (e) => {
+        if (!hideUI) return;
+        const startY = touchStartYRef2.current;
+        const zone = touchStartZoneRef.current;
+        touchStartYRef2.current = null;
+        touchStartZoneRef.current = null;
+
+        const t = e.changedTouches && e.changedTouches[0];
+        if (!t || startY == null || !zone) return;
+
+        const dy = t.clientY - startY;
+
+        if (zone === 'top' && dy > SWIPE_TRIGGER) setHideUI(false);
+        if (zone === 'bottom' && dy < -SWIPE_TRIGGER) setHideUI(false);
+      };
+
+      // ✅ 跳天/切回行程：自動回到最上面
+      useEffect(() => {
+        const el = mainRef.current;
+        if (!el) return;
+        if (view === 'itinerary') el.scrollTop = 0;
+      }, [day, view]);
 
       useEffect(() => {
         const el = mainRef.current;
         if (!el) return;
 
         const onScroll = () => {
+          // ✅ 不再因為回頂就自動顯示，避免一直跑出來
+          // 只要在最上面，就不藏（避免你回頂想按Day按鈕卻不見）
           const top = el.scrollTop || 0;
-
-          // ✅ 滑進中間：就鎖定隱藏
-          if (top > TOP_ZONE) {
-            if (!hideUI) setHideUI(true);
-            return;
-          }
-
-          // ❗️注意：就算回到 TOP_ZONE 內，也不自動顯示（避免一直跑出來）
-          // 只有手勢才會顯示
+          if (top <= TOP_ZONE) setHideUI(false);
         };
 
         el.addEventListener('scroll', onScroll, { passive: true });
         onScroll();
         return () => el.removeEventListener('scroll', onScroll);
-      }, [view, day, hideUI]);
-
-      const revealUI = () => setHideUI(false);
-
-      const onRevealTouchStart = (where, e) => {
-        if (!hideUI) return;
-        const t = e.touches && e.touches[0];
-        if (!t) return;
-        touchStartYRef.current = t.clientY;
-        touchStartAtRef.current = where; // 'top' | 'bottom'
-      };
-
-      const onRevealTouchEnd = (where, e) => {
-        if (!hideUI) return;
-        const startY = touchStartYRef.current;
-        const startedAt = touchStartAtRef.current;
-        touchStartYRef.current = null;
-        touchStartAtRef.current = null;
-
-        const t = e.changedTouches && e.changedTouches[0];
-        if (!t || startY == null) return;
-        const dy = t.clientY - startY;
-
-        // ✅ top：下拉（dy > 35）才顯示
-        if (where === 'top' && startedAt === 'top' && dy > 35) {
-          revealUI();
-        }
-
-        // ✅ bottom：上推（dy < -35）才顯示
-        if (where === 'bottom' && startedAt === 'bottom' && dy < -35) {
-          revealUI();
-        }
-      };
-
-      // ✅ 桌機支援：在上/下透明區滾輪觸發
-      const onRevealWheel = (where, e) => {
-        if (!hideUI) return;
-        if (where === 'top' && e.deltaY < 0) revealUI();
-        if (where === 'bottom' && e.deltaY > 0) revealUI();
-      };
+      }, [view, day]);
 
       useEffect(() => {
         const t = setTimeout(() => {
           try { lucide.createIcons(); } catch(e) {}
         }, 60);
         return () => clearTimeout(t);
-      }, [view, day, records.length, noticeTab, taxTab, hideUI]);
+      }, [view, day, records.length, noticeTab, taxTab]);
 
       if (view === 'cover') return (
         <div className="h-full w-full relative flex items-center justify-center text-white overflow-hidden">
@@ -792,6 +795,11 @@
 
       const headerPad = headerH;
       const bottomPad = bottomH;
+
+      const openAuroraApp = () => {
+        // ✅ 你要的：點擊直接開 northernlights.online
+        window.location.href = "https://northernlights.online";
+      };
 
       return (
         <div className="w-full h-full flex flex-col bg-slate-50 relative overflow-hidden">
@@ -826,29 +834,12 @@
             )}
           </div>
 
-          {/* ✅ 透明手勢區：hideUI 時才出現（不會擋住你內容，因為它很薄而且透明） */}
-          {hideUI && (
-            <>
-              <div
-                className="reveal-zone top"
-                onTouchStart={(e)=>onRevealTouchStart('top', e)}
-                onTouchEnd={(e)=>onRevealTouchEnd('top', e)}
-                onWheel={(e)=>onRevealWheel('top', e)}
-                aria-hidden="true"
-              />
-              <div
-                className="reveal-zone bottom"
-                onTouchStart={(e)=>onRevealTouchStart('bottom', e)}
-                onTouchEnd={(e)=>onRevealTouchEnd('bottom', e)}
-                onWheel={(e)=>onRevealWheel('bottom', e)}
-                aria-hidden="true"
-              />
-            </>
-          )}
-
           {/* Main Content */}
           <div
             ref={mainRef}
+            onPointerDown={onMainPointerDown}
+            onTouchStart={(e) => { onMainPointerDown(); onMainTouchStart(e); }}
+            onTouchEnd={onMainTouchEnd}
             className="flex-1 overflow-y-auto p-4 overflow-x-hidden"
             style={{
               paddingTop: `${headerPad}px`,
@@ -867,7 +858,8 @@
                     )}
 
                     <div className="flex items-start gap-4">
-                      <div className="shrink-0 text-4xl leading-none" aria-hidden="true">{it.icon}</div>
+                      {/* ✅ 圖示變小一點 */}
+                      <div className="shrink-0 text-3xl leading-none" aria-hidden="true">{it.icon}</div>
 
                       <div className="flex-1 min-w-0">
                         <div
@@ -942,20 +934,22 @@
                       value={curr}
                       onChange={e=>setCurr(e.target.value)}
                     >
+                      <option value="CURR">幣別</option>
                       <option value="EUR">€ EUR</option>
                       <option value="TWD">NT$ TWD</option>
                     </select>
                   </div>
 
-                  {/* ✅ 支付方式：只顯示「支付方式」，點了才選 */}
-                  <button
-                    onClick={()=>setPayPickerOpen(true)}
-                    className="w-full p-5 mb-8 bg-slate-50 rounded-3xl font-black text-2xl outline-none border border-slate-100 min-w-0 text-left btn-cute"
-                    type="button"
+                  <select
+                    className="w-full p-5 mb-8 bg-slate-50 rounded-3xl font-black text-2xl outline-none border border-slate-100 min-w-0"
+                    value={pay}
+                    onChange={e=>setPay(e.target.value)}
                   >
-                    支付方式
-                    <span className="float-right text-slate-300 font-black">›</span>
-                  </button>
+                    <option value="PAY">支付方式</option>
+                    <option value="💶現金">💶現金</option>
+                    <option value="💳星展ECO永續卡">💳星展ECO永續卡</option>
+                    <option value="💳台新Richart卡">💳台新Richart卡</option>
+                  </select>
 
                   <button onClick={addRec} className="w-full bg-blue-600 text-white py-6 rounded-3xl font-black text-4xl btn-cute shadow-lg">
                     存入帳本
@@ -1174,9 +1168,9 @@
             {view === 'itinerary' && (
               <div className="px-4 pt-3 pb-2">
                 <button
-                  onClick={() => window.open(`https://www.swpc.noaa.gov/products/aurora-30-minute-forecast`)}
+                  onClick={openAuroraApp}
                   className="w-full bg-blue-800 text-white py-3 text-sm font-black italic tracking-widest flex items-center justify-center gap-2 rounded-2xl shadow-xl border border-blue-700/30"
-                  title="點擊查看 NOAA 極光預測"
+                  title="點擊開啟極光 App"
                 >
                   🌌 今日 {lastCityName} 極光 KP 值:
                   <span className="text-green-300 text-sm">{kpValue}</span>
@@ -1191,8 +1185,7 @@
               <button onClick={()=>setView('budget')} className={`flex flex-col items-center gap-1 ${view==='budget'?'text-blue-600 scale-125 font-black italic':'text-slate-300'}`}>
                 <i data-lucide="piggy-bank" size={32}></i><span className="text-base font-black">記帳</span>
               </button>
-
-              {/* ✅ 注意/退稅 icon 縮小 */}
+              {/* ✅ 注意/退稅圖示縮小一點 */}
               <button onClick={()=>setView('notice')} className={`flex flex-col items-center gap-1 ${view==='notice'?'text-blue-600 scale-125 font-black italic':'text-slate-300'}`}>
                 <i data-lucide="info" size={26}></i><span className="text-base font-black">注意</span>
               </button>
@@ -1202,29 +1195,29 @@
             </div>
           </div>
 
-          {/* 景點介紹 Modal */}
           {modal && (
             <div className="modal-wrap" onClick={()=>setModal(null)}>
               <div className="modal-card" onClick={e=>e.stopPropagation()}>
-                <h3 className="text-4xl font-black mb-6 text-blue-900 italic underline decoration-yellow-200 underline-offset-8 leading-snug break-words">
+                {/* ✅ 彈窗標題縮小 */}
+                <h3 className="text-3xl font-black mb-5 text-blue-900 italic underline decoration-yellow-200 underline-offset-8 leading-tight break-words">
                   {modal.name}
                 </h3>
 
                 <div className="modal-body intro-scroll text-slate-600">
                   {modal.highlight && (
                     <div className="p-6 bg-red-50 rounded-[40px] border-4 border-red-100 text-red-600 text-2xl font-black italic leading-relaxed break-words mb-6">
-                      ⚠️ {modal.highlight}
+                      {modal.highlight}
                     </div>
                   )}
 
                   {modal.transport && (
-                    <div className="p-6 bg-sky-50 rounded-[40px] border-4 border-sky-100 text-sky-800 text-2xl font-black italic leading-relaxed break-words mb-6">
-                      💡 教學：<br/>{modal.transport}
+                    <div className="p-6 bg-sky-50 rounded-[40px] border-4 border-sky-100 text-sky-800 text-2xl font-black italic leading-relaxed break-words mb-6 whitespace-pre-wrap">
+                      💡 教學：{'\n'}{modal.transport}
                     </div>
                   )}
                   {modal.detail && (
-                    <div className="text-xl font-black text-slate-400 border-b-4 pb-4 italic uppercase tracking-widest leading-loose break-words mb-6">
-                      詳情：<br/>{modal.detail}
+                    <div className="text-xl font-black text-slate-400 border-b-4 pb-4 italic uppercase tracking-widest leading-loose break-words mb-6 whitespace-pre-wrap">
+                      詳情：{'\n'}{modal.detail}
                     </div>
                   )}
                   {modal.intro && (
@@ -1241,42 +1234,6 @@
               </div>
             </div>
           )}
-
-          {/* ✅ 支付方式 Picker Modal */}
-          {payPickerOpen && (
-            <div className="modal-wrap" onClick={()=>setPayPickerOpen(false)}>
-              <div className="modal-card" onClick={e=>e.stopPropagation()}>
-                <h3 className="text-4xl font-black mb-6 text-blue-900 italic underline decoration-yellow-200 underline-offset-8">
-                  支付方式
-                </h3>
-
-                <div className="modal-body">
-                  {[
-                    {v:"💶現金", label:"💶 現金"},
-                    {v:"💳星展ECO永續卡", label:"💳 星展ECO永續卡"},
-                    {v:"💳台新Richart卡", label:"💳 台新Richart卡"},
-                  ].map(opt => (
-                    <button
-                      key={opt.v}
-                      onClick={() => { setPay(opt.v); setPayPickerOpen(false); }}
-                      className="w-full mb-4 p-6 rounded-[34px] border-2 border-slate-100 text-left font-black text-2xl btn-cute bg-white active:scale-[0.99]"
-                    >
-                      {opt.label}
-                      {pay === opt.v && <span className="float-right text-blue-600">✓</span>}
-                    </button>
-                  ))}
-                </div>
-
-                <button
-                  onClick={() => setPayPickerOpen(false)}
-                  className="mt-4 w-full py-2 bg-slate-100 rounded-[26px] font-black text-slate-500 uppercase btn-cute text-lg italic"
-                >
-                  CLOSE
-                </button>
-              </div>
-            </div>
-          )}
-
         </div>
       );
     }

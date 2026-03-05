@@ -668,16 +668,28 @@
         return () => ro.disconnect();
       }, [view, day, records.length]);
 
-      // ✅ 改：不管往上/往下，只要離開頂部區域就隱藏；回到頂部區域才顯示（避免跳動/卡）
+      // ✅ 新版：padding 永遠固定（避免跳動），手指碰到中間行程就隱藏；滑回頂部才顯示
+      const TOP_ZONE = 44;
+
+      const onMainPointerDown = () => {
+        const el = mainRef.current;
+        if (!el) return;
+        const top = el.scrollTop || 0;
+
+        if (top <= TOP_ZONE) {
+          setHideUI(false);
+          return;
+        }
+        setHideUI(true);
+      };
+
       useEffect(() => {
         const el = mainRef.current;
         if (!el) return;
 
-        const TOP_ZONE = 44; // 在這個高度內才顯示 header/bottom
-
         const onScroll = () => {
           const top = el.scrollTop || 0;
-          setHideUI(top > TOP_ZONE);
+          if (top <= TOP_ZONE) setHideUI(false);
         };
 
         el.addEventListener('scroll', onScroll, { passive: true });
@@ -701,22 +713,24 @@
               2026/03/10~03/20<br/>芬蘭極光之旅
             </h1>
             <button
-  onClick={() => setView('itinerary')}
-  className="bg-sky-400 text-white px-12 py-4 rounded-full text-2xl font-black btn-cute shadow-2xl"
->
-  <span className="inline-flex items-center gap-3">
-    <span className="text-blue-200">
-      <i data-lucide="paw-print" size="30"></i>
-    </span>
-    <span>開始旅程</span>
-  </span>
-</button>
+              onClick={() => setView('itinerary')}
+              className="bg-sky-400 text-white px-12 py-4 rounded-full text-2xl font-black btn-cute shadow-2xl"
+            >
+              <span className="inline-flex items-center gap-3">
+                {/* ✅ 腳印本體藍色 */}
+                <span className="text-blue-600">
+                  <i data-lucide="paw-print" size="30"></i>
+                </span>
+                <span>開始旅程</span>
+              </span>
+            </button>
           </div>
         </div>
       );
 
-      const headerPad = hideUI ? 16 : headerH;
-      const bottomPad = hideUI ? 16 : bottomH;
+      // ✅ padding 固定（不再跟 hideUI 綁定，避免跳天/抖動）
+      const headerPad = headerH;
+      const bottomPad = bottomH;
 
       return (
         <div className="w-full h-full flex flex-col bg-slate-50 relative overflow-hidden">
@@ -754,6 +768,8 @@
           {/* Main Content */}
           <div
             ref={mainRef}
+            onPointerDown={onMainPointerDown}
+            onTouchStart={onMainPointerDown}
             className="flex-1 overflow-y-auto p-4 overflow-x-hidden"
             style={{
               paddingTop: `${headerPad}px`,
@@ -808,7 +824,8 @@
                   </div>
                 ))}
 
-                <div className="flex justify-between items-center mt-10 mb-6 px-2 gap-3">
+                {/* ✅ 強制同一行 */}
+                <div className="flex flex-nowrap justify-between items-center mt-10 mb-6 px-2 gap-3">
                   {day > 0
                     ? <button onClick={() => setDay(day-1)} className="bg-white px-6 py-4 rounded-3xl border btn-cute font-black text-lg italic whitespace-nowrap leading-none">← 上一天</button>
                     : <div/>
@@ -911,7 +928,6 @@
 
             {view === 'notice' && (
               <div className="space-y-6 overflow-x-hidden">
-                {/* Tabs */}
                 <div className="bg-white p-4 rounded-[40px] border-2 border-slate-100 flex gap-3">
                   <button
                     onClick={()=>setNoticeTab('seoul')}
@@ -977,7 +993,6 @@
                     <div className="info-card">
                       <h4 className="text-3xl font-black text-blue-600 mb-4 underline decoration-blue-100">💶 5. 貨幣與歐元</h4>
                       <p className="text-xl font-black italic leading-loose text-slate-700">芬蘭是北歐國家中唯一使用歐元的國家，愛沙尼亞也是使用歐元</p>
-                      {/* ✅ 改回：灰字在下面 */}
                       <p className="text-lg text-slate-400 font-black italic mt-2">(瑞典、丹麥、挪威和冰島都是用自己國家的克朗)</p>
                     </div>
                   </div>
@@ -987,7 +1002,6 @@
 
             {view === 'tax' && (
               <div className="space-y-6 overflow-x-hidden">
-                {/* Tabs */}
                 <div className="bg-white p-4 rounded-[40px] border-2 border-slate-100 flex gap-3">
                   <button
                     onClick={()=>setTaxTab('seoul')}
@@ -1064,7 +1078,6 @@
                       <p className="text-2xl font-black italic leading-loose text-slate-700">
                         過安檢後，在13、29、50號登機口找到Global Blue Tax Free Refund Box，退稅信封在信箱左右側，將蓋過海關章退稅單放入信封後投入信箱
                       </p>
-                      {/* ✅ 改回：標在下面 */}
                       <p className="bg-yellow-50 p-6 rounded-3xl text-red-600 text-2xl font-black italic border-2 border-yellow-100 shadow-inner mt-6">
                         建議投遞前，將稅單與退稅程序完整錄影或拍照存證
                       </p>
@@ -1117,7 +1130,6 @@
                 </h3>
 
                 <div className="modal-body intro-scroll text-slate-600">
-                  {/* ✅ highlight：紅字置頂，跟景點介紹分開 */}
                   {modal.highlight && (
                     <div className="p-6 bg-red-50 rounded-[40px] border-4 border-red-100 text-red-600 text-2xl font-black italic leading-relaxed break-words mb-6">
                       ⚠️ {modal.highlight}
@@ -1139,10 +1151,10 @@
                   )}
                 </div>
 
-                {/* ✅ CLOSE 縮小，避免遮擋內文 */}
+                {/* CLOSE 已是較小版本（不遮擋內文） */}
                 <button
                   onClick={() => setModal(null)}
-                  className="mt-4 w-full py-3 bg-slate-100 rounded-[26px] font-black text-slate-500 uppercase btn-cute text-xl italic"
+                  className="mt-4 w-full py-2 bg-slate-100 rounded-[26px] font-black text-slate-500 uppercase btn-cute text-lg italic"
                 >
                   CLOSE
                 </button>
@@ -1161,8 +1173,3 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </body>
 </html>
-
-
-
-
-

@@ -30,15 +30,12 @@
       user-select: none;
       line-height: 1.8;
       color: #1e293b;
-
-      /* ✅ 避免外層也在滾造成「看起來被裁切」 */
       overflow: hidden;
     }
 
     #root { height: 100%; }
     #root > * { height: 100%; }
 
-    /* ✅ 外框：用 dvh 避免手機網址列吃高度 */
     .app-outer{
       min-height: 100vh;
       display:flex;
@@ -57,8 +54,6 @@
       height: 100vh;
       background: #ffffff;
       position: relative;
-
-      /* ✅ 內部自己滾，不要讓 UI 跑出邊界 */
       overflow: hidden;
     }
     @supports (height: 100dvh){
@@ -95,17 +90,14 @@
     .intro-scroll::-webkit-scrollbar { width: 4px; }
     .intro-scroll::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
 
-    /* ✅ Header / Bottom 收起動畫 */
     .ui-slide { transition: transform .22s ease, opacity .22s ease; will-change: transform; }
     .ui-hide { transform: translateY(-110%); opacity: 0; pointer-events: none; }
     .bottom-hide { transform: translateY(110%); opacity: 0; pointer-events: none; }
 
-    /* ✅ iOS 安全區 */
     .safe-bottom{
       padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.75rem);
     }
 
-    /* ✅ Modal：讓 CLOSE 永遠可見，不會被擋 */
     .modal-wrap{
       position:absolute; inset:0;
       z-index: 60;
@@ -150,131 +142,665 @@
 
     const ITINERARY = [
       {
-        date: "3/10", title: "出發芬蘭 🇫🇮", cities: [{n:"桃園", q:"Taoyuan"}, {n:"阿布達比", q:"Abu+Dhabi"}], kpArea: "桃園",
-        reminders: ["記得帶護照、駕照與國際駕照、延長線", "行動電源、暖暖包、充電器、一次性用品"],
+        date: "3/10",
+        title: "出發首爾 🇰🇷",
+        cities: [
+          {n:"桃園", q:"Taoyuan"},
+          {n:"仁川", q:"Incheon"},
+          {n:"弘大", q:"Hongdae+Seoul"},
+          {n:"仁川", q:"Incheon"}
+        ],
+        kpArea: "仁川",
         items: [
-          { time: "18:20", name: "EY899 桃園 ✈️ 阿布達比", icon: "✈️", intro: "近年以全新航廈(Terminal A)啟用，具備現代化設計、寬敞空間與完善的免稅購物體驗。身為阿提哈德航空樞紐，這裡擁有豐富的中東特色商品，特別是Bateel高檔椰棗、Al Nassma駱駝奶巧克力，是轉機掃貨的理想場所。", detail: "18:20出發(桃園機場第2航廈) → AUH 3/11 00:05抵達阿布達比扎耶德國際機場(A航廈)" }
+          {
+            time: "11:40",
+            name: "OZ712 桃園 ✈️ 首爾仁川 (韓亞航空)",
+            icon: "🇰🇷",
+            type: "flight",
+            intro: "仁川國際機場不僅是轉機樞紐，本身就是熱門景點。航廈內擁有數位體驗與藝術展示，有多處綠植造景的室內花園，傳統文化體驗中心，提供免費的傳統手工藝DIY和文化表演，以及第2航廈的觀景台可近距離觀看飛機起降",
+            detail: "OZ712｜11:40 出發（桃園機場第2航廈）→ ICN 15:25 抵達（首爾仁川國際機場第2航廈）"
+          },
+          {
+            time: "16:10",
+            name: "仁川機場寄放行李",
+            icon: "🧳",
+            transport:
+              "1.「T-Locker」無人智能儲物櫃位於1樓3號出口、3樓4號出口附近\n" +
+              "2.「T-Luggage」人工櫃檯位於 3 樓出境大廳 H 櫃檯對面，亦有 Zimzero 等合作業者提供服務(3樓4號出口附近)",
+            intro: "（點我看教學）"
+          },
+          {
+            time: "18:00",
+            name: "從仁川到弘大",
+            icon: "🚆",
+            transport:
+              "🚆 從仁川到弘大（仁川 T2 → 弘大入口站 Hongik University Station）\n" +
+              "1) 建議搭 AREX（機場鐵路）\n" +
+              "2) 從仁川機場第2航廈跟著「Airport Railroad / AREX」指標\n" +
+              "3) 目的地：Hongik Univ. Station（弘大入口）",
+            intro: "弘大位於首爾的麻浦區，是年輕人和潮流愛好者的天堂，因周圍的弘益大學而得名。白天的弘大充滿藝術氣息，街頭藝人的表演、壁畫小巷的創意塗鴉隨處可見；夜晚則變身活力四射的派對聖地，無論是想感受韓國潮流文化，還是尋找獨特的旅行體驗，弘大都是遊客不容錯過的目的地"
+          },
+          {
+            name: "Olive Young Hongdae Town",
+            icon: "🧴",
+            nav: "https://naver.me/xDjQlhha",
+            highlight: "因為托運行李直掛的關係，不要買液體類的",
+            intro: "景點介紹：2024年開幕的旗艦級分店，位於弘大入口站 8 號出口附近，是繼明洞後規模龐大的指標性分店。該店共三層樓，不僅彩妝、保養品種類極齊全、空間寬敞，是韓國年輕人與旅客的熱門美妝地標"
+          },
+          {
+            name: "Musinsa Standard Hongdae",
+            icon: "👕",
+            nav: "https://naver.me/Gyyb0QjZ",
+            intro: "韓國最大時尚電商平台「MUSINSA」推出的自有品牌，主打極簡、高CP值的基本款日常服飾，常被稱為「韓國版Uniqlo」。該品牌專注於百搭的基礎設計，結合流行元素，價格親民且品質穩定，深受韓國MZ世代喜愛，實體門市如弘大、明洞店均設有現場退稅服務"
+          },
+          {
+            name: "Blue Elephant Hongdae Flagship Store",
+            icon: "👓",
+            nav: "https://naver.me/FjbqYuEN",
+            intro: "2023年成立的韓國爆紅小眾眼鏡品牌，主打以現代美學詮釋1970年代復古風，設計簡約時尚且親民的價格被譽為平價版Gentle Monster。其眼鏡深受韓星愛戴，強調輕量、修飾亞洲臉型，深受喜愛"
+          },
+          {
+            name: "弘大畢卡索街",
+            icon: "🎨",
+            nav: "https://naver.me/5DZUKipz",
+            intro: "位於首爾弘益大學校園旁，是一條以特色塗鴉、創意彩繪牆及藝術氛圍聞名的巷弄。這裡由弘大學生和當地居民共同創作，處處充滿童趣與年輕氣息，也是韓劇《沒關係，是愛情啊》、《瑪莉外宿中》等熱門劇集的經典取景地"
+          },
+          {
+            name: "午餐吃豬肉湯飯-屋同食Okdongsik",
+            icon: "🍲",
+            nav: "https://naver.me/FqHt4PxE",
+            intro: "由黑湯匙大廚玉東植經營的知名豬肉湯飯餐廳，以「去紐約的豬肉湯」之名在《黑白大廚2》中展現驚人實力。該店連續多年獲米其林必比登推薦，其特色為使用豬肉長時間熬煮的清澈湯頭，風格清淡、不油膩"
+          },
+          {
+            name: "哈莫妮超市Harmony Mart弘大店",
+            icon: "🛒",
+            nav: "https://naver.me/GWr2dZLq",
+            intro: "採買辛拉麵跟起司泡麵"
+          },
+          {
+            time: "20:30",
+            name: "從弘大回仁川機場",
+            icon: "🚆",
+            nav: "https://naver.me/5vYH2mKl",
+            transport:
+              "🚆 從弘大回仁川機場（Hongik Univ. Station → Incheon Airport 1 Terminal）\n" +
+              "1) 從 Hongik Univ. Station 進站\n" +
+              "2) 搭 AREX 往 Incheon Airport 方向\n" +
+              "3) 抵達 Incheon Airport 1 Terminal（仁川機場第一航廈）",
+            intro: "有教學列出怎麼坐車回去仁川機場"
+          },
+          {
+            time: "21:45",
+            name: "拿寄放的行李",
+            icon: "🎒",
+            intro: "（別忘記回去拿行李唷）"
+          },
+          {
+            time: "23:00",
+            name: "AY042 首爾仁川 ✈️ 赫爾辛基 (芬蘭航空)",
+            icon: "✈️",
+            type: "flight",
+            intro: "23:00搭乘芬蘭航空出發(首爾仁川國際機場第1航廈)→HEL 05:40抵達芬蘭赫爾辛基萬塔機場(景點介紹：有教學列出怎麼坐車去首都赫爾辛基，幫我預抓一下到市區大概幾點，中央車站地下一樓寄放行李)",
+            detail:
+              "AY042｜23:00 出發（首爾仁川國際機場第1航廈）→ HEL 05:40 抵達（赫爾辛基萬塔機場）\n\n" +
+              "🚆 抵達 HEL 後進市區\n" +
+              "・搭乘火車 P 線或 I 線前往 Helsinki Central（中央車站）\n" +
+              "・抵達市區後：中央車站地下一樓寄放行李"
+          }
         ]
       },
       {
-        date: "3/11", title: "北極特快車 🎅", cities: [{n:"阿布達比", q:"Abu+Dhabi"}, {n:"哥本哈根", q:"Copenhagen"}, {n:"赫爾辛基", q:"Helsinki"}], kpArea: "赫爾辛基",
+        date: "3/11",
+        title: "赫爾辛基 🇫🇮",
+        cities: [
+          {n:"赫爾辛基", q:"Helsinki"}
+        ],
+        kpArea: "赫爾辛基",
         items: [
-          { time: "00:05", name: "EY899 抵達阿布達比", icon: "🇦🇪", intro: "近年以全新航廈(Terminal A)啟用，具備現代化設計、寬敞空間與完善的免稅購物體驗。身為阿提哈德航空樞紐，這裡擁有豐富的中東特色商品，特別是Bateel高檔椰棗、Al Nassma駱駝奶巧克力，是轉機掃貨的理想場所。", detail: "AUH 3/11 00:05抵達阿布達比(A航廈)" },
-          { time: "02:25", name: "EY177 阿布達比 ✈️ 哥本哈根", icon: "✈️", intro: "丹麥主要的國際機場，也是斯堪地那維亞半島規模最大的樞紐機場。為北歐航空和挪威航空的主要樞紐，必買特色伴手禮包括皇家哥本哈根名瓷 (Royal Copenhagen)：經典的丹麥藍色唐草瓷器、Jacobsens印有安徒生童話的丹麥奶油酥餅/餅乾、Summerbird丹麥手工巧克力。", detail: "02:25出發(A航廈) → CPH 7:00抵達(第2航廈)" },
-          { time: "12:45", name: "SK1712 哥本哈根 ✈️ 赫爾辛基", icon: "✈️", transport: "從第2航廈到第3航廈：步行約5-10分鐘，沿Terminal 3指標走室內連通道即可。", intro: "搭乘SK1712前往萬塔機場。", detail: "12:45出發(第3航廈) → 15:25抵達芬蘭赫爾辛基-萬塔機場" },
-          { time: "16:30", name: "交通教學：坐車去首都赫爾辛基", icon: "🚌", transport: "搭乘火車 P 線或 I 線前往赫爾辛基機場，車程約 30 分鐘。票價約 4.1 歐元", intro: "先至車站地下一樓寄放行李再前往超市買晚餐。" },
-          { time: "17:30", name: "K-Supermarket Postitalo 採買", icon: "🛒", nav: "https://maps.app.goo.gl/igK6ux5HdFChDgke7", intro: "網路上說熟食有烤雞、肉丸、薯泥等，必喝芬蘭藍莓汁，記得打包保冷袋" },
-          { time: "19:00", name: "赫爾辛基中央車站", icon: "🏛️", nav: "https://maps.app.goo.gl/PXaWG2Ahv5XRHAHKA", intro: "2013年被BBC評為世界最美火車站之一。車站展現Art Deco風格，內部擁有高挑穹頂、華麗大吊燈與細緻的裝飾。正門兩側有四尊名為「燈籠持有人」的巨大石雕雕像，是車站的象徵" },
-          { time: "19:29", name: "北極特快車 (臥鋪火車)", icon: "🚂", intro: "芬蘭國鐵 (VR) 運營的「聖誕老人夜臥鋪列車」 (Santa Claus Express)，這是一條從芬蘭首都赫爾辛基直達北極圈門戶羅瓦涅米(聖誕老人村所在地)的著名夜間火車。它提供舒適的雙層臥鋪車廂(含私人衛浴選項)、餐廳車廂及 WiFi，是冬天前往北極圈追極光、節省住宿費用的夢幻交通工具。", detail: "19:29出發前往羅瓦涅米，22車上層215、216車廂" }
+          {
+            time: "05:40",
+            name: "AY042 抵達赫爾辛基萬塔機場",
+            icon: "🛬",
+            type: "flight",
+            intro: "23:00搭乘芬蘭航空出發(首爾仁川國際機場第1航廈)→HEL 05:40抵達芬蘭赫爾辛基萬塔機場(景點介紹：有教學列出怎麼坐車去首都赫爾辛基，幫我預抓一下到市區大概幾點，中央車站地下一樓寄放行李)",
+            detail:
+              "AY042｜23:00（前一晚）出發 → 05:40 抵達 HEL\n\n" +
+              "🚆 HEL → Helsinki Central（中央車站）\n" +
+              "・搭乘火車 P 線或 I 線前往市區\n" +
+              "・抵達市區後：中央車站地下一樓寄放行李"
+          },
+          {
+            name: "頌歌中央圖書館 Oodi",
+            icon: "📚",
+            nav: "https://maps.app.goo.gl/hYQr7z7ZiB4HnBmV9",
+            highlight: "特別幫我highlight：記得要去屋頂的觀景露臺拍照",
+            intro: "頌歌中央圖書館(Oodi)於2018年底啟用，由芬蘭 ALA Architects 設計，外觀採用自然木材與玻璃的流線型設計，像一艘巨型方舟，被認為是北歐最美圖書館之一，作為慶祝獨立百年的文化地標，被譽為「21世紀圖書館典範」。這座建築以流線型木質結構設計，顛覆傳統，融合了咖啡廳、電影院、工作坊、圖書天堂等機能；特別幫我highlight：記得要去屋頂的觀景露臺拍照"
+          },
+          {
+            name: "靜默教堂",
+            icon: "⛪",
+            nav: "https://maps.app.goo.gl/9wywyhyMLoCK9DNs8",
+            intro: "位於康比廣場，為了維護內部寧靜，入口處設有管理，並有70人的人數限制。教堂外牆使用芬蘭雲杉木，呈現光滑溫暖的橢圓形大木碗或船形結構，完全無尖銳角落，象徵平靜。這座教堂被設計為一處現代人喧囂生活中的避難所，重點在於「安靜」與「心靈療癒」。它不舉辦結婚、洗禮等傳統儀式，僅供個人祈禱或冥想"
+          },
+          {
+            name: "聖殿廣場教堂",
+            icon: "🪨",
+            nav: "https://maps.app.goo.gl/eXecVQy5u5wsCkU1A",
+            intro: "又稱岩石教堂，建於1969年，是由Suomalainen兄弟設計的現代建築奇蹟。它直接在市中心的一整塊天然岩石中炸穴開鑿而成，外部僅見淡藍色銅製圓形屋頂，內部則保留花崗岩原貌，上方有透明玻璃自然採光，音響效果極佳，是芬蘭著名的觀光景點"
+          },
+          {
+            name: "Hesburger",
+            icon: "🍔",
+            nav: "https://maps.app.goo.gl/9M2VfvsBaSqMHbtJ8",
+            intro: "芬蘭的速食連鎖品牌，被譽為「芬蘭的麥當勞」，在當地及波羅的海國家擁有極高市佔率。Hesburger 的漢堡通常會加入特製的黃瓜蛋黃醬，其薯條搭配 BBQ 辣椒粉也深受喜愛，是造訪芬蘭必嚐的在地國民美食"
+          },
+          {
+            name: "芬蘭國家圖書館",
+            icon: "🏛️",
+            nav: "https://maps.app.goo.gl/9b25KrAn6W4Yif8PA",
+            intro: "芬蘭最古老且最重要的學術圖書館之一，位於赫爾辛基市中心緊鄰赫爾辛基大學，圖書館的主樓於1845年完工，以其宏偉的新古典主義風格聞名。主閱覽室的穹頂裝飾著精美的壁畫和雕刻，為圖書館增添了一種莊嚴而靜謐的氛圍。當時它是隨著芬蘭第一所大學的建立而成立。如今擁有數百年的藏書和資料收藏歷史，是研究芬蘭歷史、文化和語言的重要資源"
+          },
+          {
+            name: "赫爾辛基座堂",
+            icon: "⛪",
+            nav: "https://maps.app.goo.gl/xyzWmWVRweKEm8Gc9",
+            intro: "又稱「白教堂」，是芬蘭首都赫爾辛基的地標性建築。這座新古典主義風格的綠頂白牆教堂建於 1830-1852 年，矗立在參議院廣場，由德國建築師恩格爾設計，具有希臘十字平面、四面柱廊和中央大圓頂，周圍有四個小圓頂，顯現出對稱的宏偉美感"
+          },
+          {
+            name: "參議院廣場",
+            icon: "🏛️",
+            nav: "https://maps.app.goo.gl/XJNu8Rj6P4Q9AgY88",
+            intro: "芬蘭首都歷史最悠久、最具標誌性的廣場，也是當地政治、宗教與文化中心。廣場以白色震撼的赫爾辛基座堂為中心，四周環繞著新古典主義風格建築，包括政府宮、赫爾辛基大學主樓等，這片優雅的廣場由建築師卡爾·恩格爾設計"
+          },
+          {
+            name: "烏斯佩斯基大教堂",
+            icon: "⛪",
+            nav: "https://maps.app.goo.gl/m9uxHw6PrYXabQ889",
+            intro: "建於1862-1868年，是北歐及西歐最大的東正教教堂。這座風格濃厚的「紅教堂」由俄國建築師設計，以紅色磚牆、金綠色洋蔥頂及13座象徵耶穌與使徒的尖塔為特色，呈現拜占庭式建築藝術"
+          },
+          {
+            name: "芬蘭總統府",
+            icon: "🏛️",
+            nav: "https://maps.app.goo.gl/gDAR8dny3taFy7ot9",
+            intro: "建於1820年，是一座新古典主義風格的帝政風格建築。它原為俄國沙皇行宮，芬蘭獨立後成為總統官邸及辦公場所，每年12月6日會舉辦著名的獨立日招待宴會。其建築外觀簡約，體現了北歐平實的風格"
+          },
+          {
+            name: "赫爾辛基集市廣場",
+            icon: "🧺",
+            nav: "https://maps.app.goo.gl/f81cnsuZcKJWgch18",
+            intro: "位於南碼頭旁，是芬蘭最熱鬧的露天市集，也是體驗當地生活、購買芬蘭特色小吃、手工藝品及鮮魚蔬果的必去景點。這裡全年開放，緊鄰老農貿市場、總統府和赫爾辛基座堂"
+          },
+          {
+            name: "Havis Amanda",
+            icon: "🧜‍♀️",
+            nav: "https://maps.app.goo.gl/oxZzt1PqqGKDqgdR6",
+            intro: "波羅的海的女兒雕像，又叫做阿曼達銅像，位於芬蘭赫爾辛基集市廣場旁，是一座少女青銅塑像。少女阿曼達被四頭海獅環繞在噴泉之中。她一手托腮，靜靜地凝視著芬蘭灣，被人們譽為“波羅的海的女兒”。這座雕像是在巴黎於1906年塑造完，1908年被運抵赫爾辛基，安放在現在的位置上，已經成為赫爾辛基市的象徵之一"
+          },
+          {
+            name: "老農貿市場",
+            icon: "🎪",
+            nav: "https://maps.app.goo.gl/Xxj83Z79HFqy1se77",
+            intro: "建於1889年，是芬蘭最古老的室內市場，座落於南碼頭旁。這裡曾是為提升食品衛生而建立，如今則是融合百年歷史與現代風格的熱門景點，乾淨整潔，販售新鮮海產、鮭魚湯、起司、馴鹿肉及特色伴手禮"
+          },
+          {
+            name: "吃SOUP+MORE鮭魚湯",
+            icon: "🍲",
+            nav: "https://maps.app.goo.gl/URgMN58wNkSTpyHF9",
+            intro: "位於赫爾辛基老農貿市場，是當地最著名的平價美食攤位。主打熱騰騰的芬蘭傳統奶油鮭魚湯 (Lohikeitto)，用料豐富，含鮭魚及馬鈴薯，另提供免費自助麵包與青醬，是高CP值的道地溫暖選擇"
+          },
+          {
+            name: "芬蘭國家劇院",
+            icon: "🎭",
+            nav: "https://maps.app.goo.gl/oNRgraq6LeAni3yB8",
+            intro: "建立於 1872 年，是歷史最悠久的芬蘭語專業劇場。該建築採用浪漫民族主義風格，由建築師 Onni Tarjanne 設計，於 1902 年落成。劇院以其宏偉的花崗岩建築、精湛的芬蘭語戲劇演出聞名，擁有包括主舞台在內的多個表演空間，是赫爾辛基的文化地標"
+          },
+          {
+            name: "K-Supermarket Postitalo超市買晚餐飲料",
+            icon: "🛒",
+            nav: "https://maps.app.goo.gl/igK6ux5HdFChDgke7",
+            highlight: "特別幫我highlight：記得打包保冷袋",
+            intro: "網路上說熟食有烤雞、肉丸、薯泥等，必喝芬蘭藍莓汁；特別幫我highlight：記得打包保冷袋"
+          },
+          {
+            time: "18:45",
+            name: "到赫爾辛基中央車站地下一樓拿行李",
+            icon: "🎒",
+            nav: "https://maps.app.goo.gl/PXaWG2Ahv5XRHAHKA",
+            intro: "2013年被BBC評為世界最美火車站之一。車站展現Art Deco風格，內部擁有高挑穹頂、華麗大吊燈與細緻的裝飾。正門兩側有四尊名為「燈籠持有人」的巨大石雕雕像，是車站的象徵"
+          },
+          {
+            time: "19:29",
+            name: "北極特快車(聖誕老人臥鋪火車)",
+            icon: "🚂",
+            intro: "芬蘭國鐵 (VR) 運營的「聖誕老人夜臥鋪列車」(Santa Claus Express)，這是一條從芬蘭首都赫爾辛基直達北極圈門戶羅瓦涅米(聖誕老人村所在地)的著名夜間火車。它提供舒適的雙層臥鋪車廂(含私人衛浴)、餐廳車廂及 WiFi，是冬天前往北極圈追極光、節省住宿費用的夢幻交通工具",
+            detail: "19:29 出發前往羅瓦涅米，22車上層215、216車廂"
+          }
         ]
       },
       {
-        date: "3/12", title: "極光之旅 🌌", cities: [{n:"羅瓦涅米", q:"Rovaniemi"}, {n:"烏茨約基", q:"Utsjoki"}], kpArea: "烏茨約基",
+        date: "3/12",
+        title: "極光之旅 🌌",
+        cities: [
+          {n:"羅瓦涅米", q:"Rovaniemi"},
+          {n:"伊納里", q:"Inari"},
+          {n:"烏茨約基", q:"Utsjoki"}
+        ],
+        kpArea: "烏茨約基",
         items: [
-          { time: "07:30", name: "Sixt Autovuokraamo取車", icon: "🚗", nav: "https://maps.app.goo.gl/R3EEnwb6gh3rkoXH8", intro: "Sixt Autovuokraamo Rovaniemi Railway Station 取車啟程。" },
-          { name: "聖誕老人認證麥當勞 (拿明信片)", icon: "🍔", nav: "https://maps.app.goo.gl/hNjENBZg6NLM6LEB8", intro: "聖誕老人認證的麥當勞，曾長期霸榜世界最北麥當勞。雖然在2024年3月被挪威特羅姆瑟麥當勞超越，但仍是遊客必訪的極圈打卡點。該店提供免費特色限定明信片，具有紀念價值。" },
-          { name: "K-Market Inari 超市採買", icon: "🛒", nav: "https://maps.app.goo.gl/mp45emzWwvdnDMsi9", intro: "沿路會先去K-Market Inari超市採買五天晚餐四天早餐食材。" },
-          { name: "Osman Kelohovi", icon: "🏘️", nav: "https://maps.app.goo.gl/vBx6e2htaYv1mGk99", intro: "位於芬蘭北部拉普蘭地區烏茨約基(Utsjoki)，鄰近挪威邊境，主打充滿北歐特色的傳統木屋(Kelohovi)，「Kelo」在芬蘭語中指乾燥的松樹木，通常是指樹齡極長、自然風乾的木材。Osman Kelohovi 利用這種材料建造，具有獨特的傳統北歐風格與良好的保溫性能，適合尋求幽靜、極光或體驗拉普蘭文化的旅客。" },
-          { name: "煮晚餐 + 追極光", icon: "✨", intro: "在溫馨木屋享受拉普蘭的夜晚。" }
+          { time: "07:20", name: "早上抵達羅馬涅米", icon: "🚂", intro: "（抵達後準備取車出發）" },
+          {
+            time: "07:30",
+            name: "Sixt Autovuokraamo取車",
+            icon: "🚗",
+            nav: "https://maps.app.goo.gl/R3EEnwb6gh3rkoXH8",
+            intro: "Sixt Autovuokraamo Rovaniemi Railway Station 取車啟程"
+          },
+          {
+            name: "McDonald's Rovaniemi Lampela吃早餐+拿免費明信片",
+            icon: "🍔",
+            nav: "https://maps.app.goo.gl/hNjENBZg6NLM6LEB8",
+            intro: "聖誕老人認證的麥當勞，曾長期霸榜世界最北麥當勞。雖然在2024年3月被挪威特羅姆瑟麥當勞超越，但仍是遊客必訪的極圈打卡點。該店提供免費特色限定明信片，具有紀念價值"
+          },
+          {
+            name: "K-Market Inari超市採買",
+            icon: "🛒",
+            nav: "https://maps.app.goo.gl/mp45emzWwvdnDMsi9",
+            intro: "沿路會先去K-Market Inari超市採買四天早晚餐食材"
+          },
+          {
+            name: "Osman Kelohovi(Utsjoki住宿)",
+            icon: "🏘️",
+            nav: "https://maps.app.goo.gl/vBx6e2htaYv1mGk99",
+            intro: "位於芬蘭北部拉普蘭地區烏茨約基(Utsjoki)，鄰近挪威邊境，主打充滿北歐特色的傳統木屋(Kelohovi)，「Kelo」在芬蘭語中指乾燥的松樹木，通常是指樹齡極長、自然風乾的木材。Osman Kelohovi 利用這種材料建造，具有獨特的傳統北歐風格與良好的保溫性能，適合尋求幽靜、極光或體驗拉普蘭文化的旅客"
+          },
+          { name: "煮晚餐+追極光", icon: "✨", intro: "煮晚餐+追極光" }
         ]
       },
       {
-        date: "3/13", title: "冰釣體驗 🎣", cities: [{n:"伊納里", q:"Inari"}], kpArea: "伊納里",
+        date: "3/13",
+        title: "冰釣體驗 🎣",
+        cities: [
+          {n:"烏茨約基", q:"Utsjoki"},
+          {n:"伊納里", q:"Inari"}
+        ],
+        kpArea: "伊納里",
         items: [
-          { name: "吃超市買的早餐", icon: "🥐", intro: "簡單溫馨的出發準備。" },
-          { time: "10:30", name: "往回開車到 Inari", icon: "🚗", intro: "結束烏茨約基行程，往南回到伊納里。" },
-          { time: "13:00", name: "Galddoaivi Safaris 冰釣", icon: "❄️", nav: "https://maps.app.goo.gl/YzqVW8bZuu7tm8BNA?g_st=al", intro: "位於芬蘭拉普蘭的伊納里(Inari)，提供道地的伊納里湖(Lake Inari)冰釣體驗。活動約2小時，適合各年齡層，包含在冰凍湖面上鑽孔、釣魚等裝備，讓遊客能親身嘗試這項北歐傳統冬季活動。" },
-          { name: "Visit Inari - Crow Creek Cabins", icon: "🏘️", nav: "https://maps.app.goo.gl/NaD4R2RQyssJDmS37", intro: "位於芬蘭拉普蘭伊納里(Inari)，提供溫馨的木屋住宿，環境清幽且享有園景，靠近伊納里湖，是體驗北極圈風光的舒適選擇。" },
-          { name: "煮晚餐 (追極光)", icon: "✨", intro: "在湖畔木屋早早休息或等待極光。" }
+          { name: "吃超市買的早餐", icon: "🥐", intro: "吃超市買的早餐之後" },
+          { time: "10:30", name: "往回開車到Inari", icon: "🚗", intro: "10點半往回開車到Inari" },
+          {
+            time: "13:00",
+            name: "Galddoaivi Safaris冰釣",
+            icon: "❄️",
+            nav: "https://maps.app.goo.gl/YzqVW8bZuu7tm8BNA?g_st=al",
+            intro: "位於芬蘭拉普蘭的伊納里(Inari)，提供道地的伊納里湖(Lake Inari)冰釣體驗。活動約2小時，適合各年齡層，包含在冰凍湖面上鑽孔、釣魚等裝備，讓遊客能親身嘗試這項北歐傳統冬季活動"
+          },
+          {
+            name: "Visit Inari - Crow Creek Cabins住宿",
+            icon: "🏘️",
+            nav: "https://maps.app.goo.gl/NaD4R2RQyssJDmS37",
+            intro: "位於芬蘭拉普蘭伊納里(Inari)，提供溫馨的木屋住宿，環境清幽且享有園景，靠近伊納里湖，是體驗北極圈風光的舒適選擇"
+          },
+          { name: "煮晚餐(早早休息/追極光)", icon: "✨", intro: "煮晚餐(早早休息/追極光)" }
         ]
       },
       {
-        date: "3/14", title: "破冰船冒險 ❄️", cities: [{n:"瑞典 Båtskärsnäs", q:"Batskarsnas"}, {n:"羅瓦涅米", q:"Rovaniemi"}], kpArea: "羅瓦涅米",
+        date: "3/14",
+        title: "破冰船冒險 ❄️",
+        cities: [
+          {n:"伊納里", q:"Inari"},
+          {n:"瑞典 Båtskärsnäs", q:"Batskarsnas"},
+          {n:"羅瓦涅米", q:"Rovaniemi"}
+        ],
+        kpArea: "羅瓦涅米",
         items: [
-          { time: "04:30", name: "凌晨開車前往瑞典", icon: "🚗", intro: "04:30準時出發前往瑞典破冰船碼頭。" },
-          { time: "11:00", name: "抵達 Polar Explorer 碼頭", icon: "⚓", nav: "https://maps.app.goo.gl/5kTLXZe2ALM4GSzo8?g_st=al", intro: "位於瑞典：Axelsviksvägen 291C, 952 95 Båtskärsnäs, 瑞典。" },
-          { time: "11:30", name: "破冰船 + 龍蝦裝漂浮", icon: "🚢", intro: "一艘建造於1976年的大型破冰船，通常在瑞典與芬蘭交界的拉普蘭地區波的尼亞灣進行約3小時的冰海航行，在航行中展現將厚冰壓碎的震撼場面。該船提供獨特的浮動救生衣(龍蝦裝)冰海漂浮、冰上散步、參觀引擎室與駕駛艙、以及享受暖心果汁等體驗，完成旅程後，每位遊客可獲得一張由船長頒發的獨家破冰船及游泳證書。" },
-          { name: "Motelli Rovaniemi 車屋", icon: "🏘️", nav: "https://maps.app.goo.gl/jAzjF3J1VToe9Qqb9", intro: "位於芬蘭羅瓦涅米市郊的平價、高性價比汽車旅館，以其溫馨木屋風格、私人桑拿房、完整廚房設備及便利的公路自駕位置聞量。這裡距離聖誕老人村約 10 分鐘車程，適合作為探索北極圈的舒適據點，由於汽車旅館位於羅瓦涅米較安靜的區域，相比市中心光害更少，有機會在住宿點附近直接看到極光。" }
+          { time: "04:30", name: "凌晨出發", icon: "🚗", intro: "凌晨4:30出發" },
+          {
+            time: "11:00",
+            name: "抵達Polar Explorer Icebreaker cruise terminal",
+            icon: "⚓",
+            nav: "https://maps.app.goo.gl/5kTLXZe2ALM4GSzo8?g_st=al",
+            intro: "抵達 Polar Explorer Icebreaker cruise terminal"
+          },
+          {
+            time: "11:30",
+            name: "Polar Explorer破冰船+龍蝦裝漂浮",
+            icon: "🚢",
+            intro: "一艘建造於1976年的大型破冰船，通常在瑞典與芬蘭交界的拉普蘭地區波的尼亞灣進行約3小時的冰海航行，在航行中展現將厚冰壓碎的震撼場面，是體驗北極圈震撼破冰能力的熱門選擇。該船提供獨特的浮動救生衣(龍蝦裝)冰海漂浮、冰上散步、參觀引擎室與駕駛艙、以及享受暖心果汁等體驗，完成旅程後，每位遊客可獲得一張由船長頒發的獨家破冰船及游泳證書"
+          },
+          {
+            name: "Motelli Rovaniemi羅馬涅米車屋",
+            icon: "🏘️",
+            nav: "https://maps.app.goo.gl/jAzjF3J1VToe9Qqb9",
+            intro: "位於芬蘭羅瓦涅米市郊的平價、高性價比汽車旅館，以其溫馨木屋風格、私人桑拿房、完整廚房設備及便利的公路自駕位置聞名。這裡距離聖誕老人村約 10 分鐘車程，適合作為探索北極圈的舒適據點，由於汽車旅館位於羅瓦涅米較安靜的區域，相比市中心光害更少，有機會在住宿點附近直接看到極光"
+          },
+          { name: "煮晚餐(早早休息/追極光)", icon: "✨", intro: "煮晚餐(早早休息/追極光)" }
         ]
       },
       {
-        date: "3/15", title: "聖誕老人村 🎅", cities: [{n:"羅瓦涅米", q:"Rovaniemi"}], kpArea: "羅瓦涅米",
+        date: "3/15",
+        title: "聖誕老人村 🎅",
+        cities: [
+          {n:"羅瓦涅米", q:"Rovaniemi"}
+        ],
+        kpArea: "羅瓦涅米",
         items: [
-          { time: "08:30", name: "Santa Claus Village", icon: "🏰", nav: "https://maps.app.goo.gl/jSCxqtJx5S3ZaA166", intro: "芬蘭羅瓦涅米(Rovaniemi)的聖誕老人村(Santa Claus Village)位於北極圈線上，是全球最著名的夢幻童話小鎮，全年免費開放。遊客可在此跨越北極圈線、親訪聖誕老人、在專屬郵局寄信，並體驗馴鹿或哈士奇雪橇，是體驗冬季聖誕魔幻氛圍的最佳地點。" },
-          { time: "09:00", name: "聖誕老人見面", icon: "🎅", nav: "https://maps.app.goo.gl/bQpJXub15wvhDQtHA", intro: "在聖誕老人辦公室(Santa Claus Office)與本尊聊天、合照，實現兒時夢夢想。" },
-          { name: "聖誕郵局寄信", icon: "📮", nav: "https://maps.app.goo.gl/jV7Fs1CU3a9RsNLY9", intro: "從「最忙碌的郵局」寄出蓋有北極圈專屬郵戳的明信片，明信片上會有聖誕郵局的戳章或貼紙，紅郵筒可指定在聖誕節前送達。" },
-          { name: "領取北極圈證書", icon: "📜", nav: "https://maps.app.goo.gl/uXBiq7v7PJnDSGkW6", intro: "領線上訂購的北極圈證書，證書上面會寫有名字及聖誕老人村的官方印章。" },
-          { time: "11:00", name: "All about Salmon 午餐", icon: "🐟", nav: "https://maps.app.goo.gl/2jeMM8b2QVEHnUAHA", intro: "極具知名度的拉普蘭特色餐廳。以傳統帳篷、明火燻烤的新鮮鮭魚聞名，外酥內嫩，配上薯泥沙拉，提供最正宗的北歐風味。由於不接受訂位且排隊人潮多，是羅瓦涅米聖誕老人村必吃的打卡美食。" },
-          { name: "北極圈線揮手直播", icon: "🎥", nav: "https://maps.app.goo.gl/A38hAQD3AL8Ny8oz9", intro: "聖誕老人村位在北緯66度的北極圈上，北極圈的標註線戶外有一個，戶外牆上的鏡頭是YouTube 24小時不間斷直播，記得跟鏡頭揮手並且用手機螢幕錄影唷，在遊客中心兼禮品店裡面也有一個室內的北極圈標註線，記得兩個地方都去打卡一下。" },
-          { time: "14:00", name: "哈士奇拉雪撬 (2.5km)", icon: "🐕", nav: "https://maps.app.goo.gl/7TNVrbiVD8kBZM4X9", intro: "位於芬蘭羅瓦涅米聖誕老人村的熱門冬季活動，讓遊客能乘坐由可愛哈士奇拉動的雪橇穿梭於拉普蘭的冰雪森林中。2.5公里的哈士奇雪橇大概騎8-12分鐘，騎完後還可以到小屋裡取暖，喝熱果汁和吃餅乾。" },
-          { name: "馴鹿拉雪撬 (800m)", icon: "🦌", nav: "https://maps.app.goo.gl/KmJiyQCH6aJrTnXK8", intro: "芬蘭羅瓦涅米聖誕老人村的「800公尺馴鹿雪橇(Reindeer Safari)」是一種浪漫悠閒的極地體驗，耗時約 15-20 分鐘，不同於哈士奇雪橇速度感，遊客坐在由薩米人牧民駕駛的馴鹿雪橇上，緩慢穿梭於白雪皚皚的森林中，能欣賞童話般的美景並體驗薩米文化。" },
-          { name: "Snowman World 冰雪樂園", icon: "⛄", nav: "https://maps.app.goo.gl/bX7BkrG9t94oyA788", intro: "一個全冰雪打造的冬季樂園，每年邀請藝術家設計冰雕、雪雕，提供刺激的冰滑梯、雪胎、溜冰體驗。園區特色包括完全由冰製成的酒吧與餐廳，適合在北極圈內體驗冰雪藝術與玩樂，17:00~19:00有Snowman Disco。" }
+          {
+            time: "08:30",
+            name: "Santa Claus Village聖誕老人村",
+            icon: "🏰",
+            nav: "https://maps.app.goo.gl/jSCxqtJx5S3ZaA166",
+            intro: "芬蘭羅瓦涅米(Rovaniemi)的聖誕老人村(Santa Claus Village)位於北極圈線上，是全球最著名的夢幻童話小鎮，全年免費開放。遊客可在此跨越北極圈線、親訪聖誕老人、在專屬郵局寄信，並體驗馴鹿或哈士奇雪橇，是體驗冬季聖誕魔幻氛圍的最佳地點"
+          },
+          {
+            time: "09:00",
+            name: "Santa Claus Office跟聖誕老人見面",
+            icon: "🎅",
+            nav: "https://maps.app.goo.gl/bQpJXub15wvhDQtHA",
+            intro: "在聖誕老人辦公室(Santa Claus Office)與本尊聊天、合照，實現兒時夢想"
+          },
+          {
+            name: "Santa's Post Office寫+寄明信片",
+            icon: "📮",
+            nav: "https://maps.app.goo.gl/jV7Fs1CU3a9RsNLY9",
+            intro: "從「最忙碌的郵局」寄出蓋有北極圈專屬郵戳的明信片，明信片上會有聖誕郵局的戳章或貼紙，紅郵筒可指定在聖誕節前送達"
+          },
+          {
+            name: "Arctic Circle Information領北極圈證書",
+            icon: "📜",
+            nav: "https://maps.app.goo.gl/uXBiq7v7PJnDSGkW6",
+            intro: "領線上訂購的北極圈證書，證書上面會寫有名字及聖誕老人村的官方印章"
+          },
+          {
+            time: "11:00",
+            name: "All about Salmon吃午餐",
+            icon: "🐟",
+            nav: "https://maps.app.goo.gl/2jeMM8b2QVEHnUAHA",
+            intro: "極具知名度的拉普蘭特色餐廳。以傳統帳篷、明火燻烤的新鮮鮭魚聞名，外酥內嫩，配上薯泥沙拉，提供最正宗的北歐風味。由於不接受訂位且排隊人潮多，是羅瓦涅米聖誕老人村必吃的打卡美食"
+          },
+          {
+            name: "Arctic Circle Line跨越北極圈並且跟YouTube直播鏡頭揮手",
+            icon: "🎥",
+            nav: "https://maps.app.goo.gl/A38hAQD3AL8Ny8oz9",
+            intro: "聖誕老人村位在北緯66度的北極圈上，北極圈的標註線戶外有一個，戶外牆上的鏡頭是YouTube 24小時不間斷直播，記得跟鏡頭揮手並且用手機螢幕錄影唷，在遊客中心兼禮品店裡面也有一個室內的北極圈標註線，記得兩個地方都去打卡一下"
+          },
+          {
+            time: "14:00",
+            name: "Santa's Husky Rides哈士奇拉雪撬(2.5km)",
+            icon: "🐕",
+            nav: "https://maps.app.goo.gl/7TNVrbiVD8kBZM4X9",
+            intro: "位於芬蘭羅瓦涅米聖誕老人村的熱門冬季活動，讓遊客能乘坐由可愛哈士奇拉動的雪橇穿梭於拉普蘭的冰雪森林中。2.5公里的哈士奇雪橇大概騎8-12分鐘，騎完後還可以到小屋裡取暖，喝熱果汁和吃餅乾"
+          },
+          {
+            name: "Santa Claus Reindeer馴鹿拉雪撬Forest Path - 800 m reindeer sleigh ride",
+            icon: "🦌",
+            nav: "https://maps.app.goo.gl/KmJiyQCH6aJrTnXK8",
+            intro: "芬蘭羅瓦涅米聖誕老人村的「800公尺馴鹿雪橇(Reindeer Safari)」是一種浪漫悠閒的極地體驗，耗時約 15-20 分鐘，不同於哈士奇雪橇的速度感，遊客坐在由薩米人牧民駕駛的馴鹿雪橇上，緩慢穿梭於白雪皚皚的森林中，能欣賞童話般的美景並體驗薩米文化"
+          },
+          {
+            name: "Snowman World",
+            icon: "⛄",
+            nav: "https://maps.app.goo.gl/bX7BkrG9t94oyA788",
+            intro: "一個全冰雪打造的冬季樂園，每年邀請藝術家設計冰雕、雪雕，提供刺激的冰滑梯、雪胎、溜冰體驗。園區特色包括完全由冰製成的酒吧與餐廳，適合在北極圈內體驗冰雪藝術與玩樂，17:00~19:00有Snowman Disco"
+          },
+          { name: "煮晚餐→追極光", icon: "✨", intro: "煮晚餐→追極光" }
         ]
       },
       {
-        date: "3/16", title: "回赫爾辛基 🚂", cities: [{n:"羅瓦涅米", q:"Rovaniemi"}], kpArea: "羅瓦涅米",
+        date: "3/16",
+        title: "北極特快車 🚂",
+        cities: [
+          {n:"羅瓦涅米", q:"Rovaniemi"}
+        ],
+        kpArea: "羅瓦涅米",
         items: [
-          { name: "早上車屋休息", icon: "🛌", intro: "享受悠閒的極地早晨。" },
-          { name: "北極圈科學博物館 Arktikum", icon: "🏛️", nav: "https://maps.app.goo.gl/4W7L26qEtsMiSrvEA", intro: "一座結合拉普蘭省博物館與北極中心的綜合性科研中心與博物館，致力於展示北極地區的生態、文化、歷史及氣候變化。該館以其172米長的玻璃圓頂走廊為特色，建築設計模擬了極地動物在地底躲避嚴寒的習性。" },
-          { time: "19:15", name: "Sixt Autovuokraamo 還車", icon: "🚗", nav: "https://maps.app.goo.gl/R3EEnwb6gh3rkoXH8", intro: "記得先去加油站加滿油，結束租車自駕，前往羅瓦涅米火車站。" },
-          { time: "21:00", name: "臥鋪火車回赫爾辛基", icon: "🚂", intro: "22車上層215、216車廂。" }
+          { name: "早上車屋耍廢", icon: "🛌", intro: "早上車屋耍廢" },
+          {
+            name: "北極圈科學博物館 Arktikum",
+            icon: "🏛️",
+            nav: "https://maps.app.goo.gl/4W7L26qEtsMiSrvEA",
+            intro: "一座結合拉普蘭省博物館與北極中心的綜合性科研中心與博物館，致力於展示北極地區的生態、文化、歷史及氣候變化。該館以其172米長的玻璃圓頂走廊為特色，建築設計模擬了極地動物在地底躲避嚴寒的習性"
+          },
+          {
+            time: "19:15",
+            name: "Sixt Autovuokraamo還車",
+            icon: "🚗",
+            nav: "https://maps.app.goo.gl/R3EEnwb6gh3rkoXH8",
+            intro: "記得先去加油站加滿油，結束租車自駕，前往羅瓦涅米火車站"
+          },
+          {
+            time: "20:30",
+            name: "Rovaniemen rautatieasema",
+            icon: "🏛️",
+            nav: "https://maps.app.goo.gl/CBSXy4mso4JuCaQE7",
+            intro: "Rovaniemen rautatieasema"
+          },
+          {
+            time: "21:00",
+            name: "臥鋪火車回赫爾辛基",
+            icon: "🚂",
+            intro: "晚上21:00臥鋪火車回赫爾辛基，22車上層215、216車廂"
+          }
         ]
       },
       {
-        date: "3/17", title: "赫爾辛基巡禮 🇫🇮", cities: [{n:"赫爾辛基", q:"Helsinki"}], kpArea: "赫爾辛基",
+        date: "3/17",
+        title: "赫爾辛基 🇫🇮",
+        cities: [
+          {n:"赫爾辛基", q:"Helsinki"}
+        ],
+        kpArea: "赫爾辛基",
         items: [
-          { name: "Bob W Helsinki Kaarti", icon: "🏘️", nav: "https://maps.app.goo.gl/LrHxxTSFzfS9AiEbA", intro: "位於赫爾辛基市中心的現代設計風格公寓式飯店，主打無接觸自助入住、高CP值與時尚簡約風格。地理位置優越，鄰近集市廣場與電車站，交通便利。" },
-          { name: "老農貿市場", icon: "🎪", nav: "https://maps.app.goo.gl/Xxj83Z79HFqy1se77", intro: "建於1889年，是芬蘭最古老的室內市場，座落於南碼頭旁。這裡曾是為提升食品衛生而建立，如今則是融合百年歷史與現代風格的熱門景點，乾淨整潔，販售新鮮海產、鮭魚湯、起司、馴鹿肉及特色伴手禮。" },
-          { name: "SOUP+MORE 鮭魚湯", icon: "🍲", nav: "https://maps.app.goo.gl/URgMN58wNkSTpyHF9", intro: "位於赫爾辛基老農貿市場，是當地最著名的平價美食攤位。主打熱騰騰的芬蘭傳統奶油鮭魚湯 (Lohikeitto)，用料豐富，含鮭魚及馬鈴薯，另提供免費自助麵包與青醬，是高CP值的道地溫暖選擇。" },
-          { name: "烏斯佩斯基大教堂", icon: "⛪", nav: "https://maps.app.goo.gl/m9uxHw6PrYXabQ889", intro: "建於1862-1868年，是北歐及西歐最大的東正教教堂。這座風格濃厚的「紅教堂」由俄國建築師設計，以紅色磚牆、金綠色洋蔥頂及13座象徵耶穌與使徒的尖塔為特色，呈現拜占庭式建築藝術。" },
-          { name: "赫爾辛基座堂", icon: "⛪", nav: "https://maps.app.goo.gl/xyzWmWVRweKEm8Gc9", intro: "又稱「白教堂」，是芬蘭首都赫爾辛基的地標性建築。這座新古典主義風格的綠頂白牆教堂建於 1830-1852 年，矗立在參議院廣場，由德國建築師恩格爾設計，具有希臘十字平面、四面柱廊和中央大圓頂，周圍有四個小圓頂，顯現出對稱的宏偉美感。" },
-          { name: "參議院廣場", icon: "🏛️", nav: "https://maps.app.goo.gl/XJNu8Rj6P4Q9AgY88", intro: "芬蘭首都歷史最悠久、最具標誌性的廣場，也是當地政治、宗教與文化中心。廣場以白色震撼的赫爾辛基座堂為中心，四周環繞著新古典主義風格建築，包括政府宮、赫爾辛基大學主樓等，這片優雅的廣場由建築師卡爾·恩格爾設計。" },
-          { name: "頌歌中央圖書館 Oodi", icon: "📚", nav: "https://maps.app.goo.gl/hYQr7z7ZiB4HnBmV9", intro: "頌歌中央圖書館(Oodi)於2018年底啟用，由芬蘭 ALA Architects 設計，外觀採用自然木材與玻璃的流線型設計，像一艘巨型方舟，被認為是北歐最美圖書館之一，作為慶祝獨立百年的文化地標，被譽為「21世紀圖書館典範」。這座建築以流線型木質結構設計，顛覆傳統，融合了咖啡廳、電影院、工作坊、圖書天堂等機能。" },
-          { name: "聖殿廣場教堂", icon: "🪨", nav: "https://maps.app.goo.gl/eXecVQy5u5wsCkU1A", intro: "又稱岩石教堂，建於1969年，是由Suomalainen兄弟設計的現代建築奇蹟。它直接在市中心的一整塊天然岩石中炸穴開鑿而成，外部僅見淡藍色銅製圓形屋頂，內部則保留花崗岩原貌，上方有透明玻璃自然採光，音響效果極佳，是芬蘭著名的觀光景點。" },
-          { name: "靜默教堂", icon: "⛪", nav: "https://maps.app.goo.gl/9wywyhyMLoCK9DNs8", intro: "位於康比廣場，為了維護內部寧靜，入口處設有管理，並有70人的人數限制。教堂外牆使用芬蘭雲杉木，呈現光滑溫暖的橢圓形大木碗或船形結構，完全無尖銳角落，象徵平靜。這座教堂被設計為一處現代人喧囂生活中的避難所，重點在於「安靜」與「心靈療癒」。它不舉辦結婚、洗禮等傳統儀式，僅供個人祈禱或冥想。" },
-          { name: "晚餐 Pho Viet 越南河粉", icon: "🍜", nav: "https://maps.app.goo.gl/t9m99uKHMPkqhofLA", intro: "一家位於芬蘭赫爾辛基的著名的越南料理餐廳，以道地、熱騰騰的越南河粉聞名，特別適合在寒冷的芬蘭天氣中享用。該餐廳提供多樣化的越南菜單，包括招牌牛肉河粉、雞絲河粉及春捲。其以新鮮食材與傳統烹飪手法著稱，是當地受歡迎的亞洲美食選擇。" },
-          { name: "全世界最便宜 LV", icon: "👜", navs: [{l:"第一間", u:"https://maps.app.goo.gl/q94XBw4zmRDopnbAA"}, {l:"第二間", u:"https://maps.app.goo.gl/RTaeeug7ai7M6LRu6"}], intro: "芬蘭被譽為全世界購買Louis Vuitton最便宜的地方，主要歸因於其極高的退稅率(最高可達 17%)。雖然歐盟區定價一致，但芬蘭高額的增值稅加上便捷的退稅服務，使得退稅後的價格通常比法國更劃算。" },
-          { name: "S-market 伴手禮採買", icon: "🛒", nav: "https://maps.app.goo.gl/gDTBYLw4sQoCEtMH7", intro: "1. Fazer巧克力\n被譽為「芬蘭國民巧克力」，幾乎是每個到訪芬蘭的旅客必帶的伴手禮。它的特別之處在於使用純正牛奶與高品質可可調配而成，口感濃郁滑順卻不會過於甜膩，符合北歐人喜歡的「純淨自然」風味\n2. Nordqvisit紅茶包組\n芬蘭的品牌，常有嚕嚕米的聯名，可買4種紅茶組盒(草莓味、檸檬味、野莓味、藍莓馬芬口味紅茶茶包各5包)\n3. Lumene\n創立於1970年的芬蘭國民級護膚與彩妝品牌，以北歐純淨自然為核心，主打高達99%以上的天然成分，如北極泉水、雲莓與白樺樹汁。該品牌以專利技術結合極地天然資源，專注於補水、抗氧化與提升肌膚光澤，其保濕系列(Nordic Hydra)常被譽為「平價專櫃」，適合乾燥與敏感肌，是北歐風格護膚的代表\n4. 各種糖果餅乾。" }
+          { time: "09:15", name: "抵達赫爾辛基", icon: "🚆", intro: "早上09:15抵達赫爾辛基" },
+          {
+            name: "Bob W Helsinki Kaarti",
+            icon: "🏘️",
+            nav: "https://maps.app.goo.gl/LrHxxTSFzfS9AiEbA",
+            intro: "位於赫爾辛基市中心的現代設計風格公寓式飯店，主打無接觸自助入住、高CP值與時尚簡約風格。地理位置優越，鄰近集市廣場與電車站，交通便利"
+          },
+          { name: "HSL app上購買AB區一日券", icon: "🎫", intro: "HSL app上購買AB區一日券" },
+          {
+            name: "Puu-Vallila 彩色木屋社區",
+            icon: "🏡",
+            nav: "https://maps.app.goo.gl/F13VDLBvhWpSCyMBA",
+            highlight: "特別幫我highlight：往社區中間走就會看到一個石頭堆疊的小小觀景台，可以眺望四周的老舊建築",
+            intro: "20世紀初當時為了幫助工薪階級的家庭而規劃的住宅區，原本因城市規劃預將此區的老舊建築拆除，1970年代因為居民的倡議而把這個區域保留了下來，也因其被列為國家重要文化環境建築，所以建築外觀的顏色選擇上，要經過博物館的核准才得以粉刷；特別幫我highlight：往社區中間走就會看到一個石頭堆疊的小小觀景台，可以眺望四周的老舊建築"
+          },
+          {
+            name: "西貝流士紀念碑",
+            icon: "🎼",
+            nav: "https://maps.app.goo.gl/JQNwkckKJD672pAfA",
+            intro: "西貝流士紀念碑，是為了致敬芬蘭國寶級作曲家尚·西貝流士（Jean Sibelius）而建。由藝術家埃拉·希爾圖寧（Eila Hiltunen）設計，於1967年落成。它由600多根不鏽鋼管焊接成管風琴造型，象徵自然與音樂的結合，是赫爾辛基著名的地標"
+          },
+          {
+            name: "芬蘭國家歌劇院",
+            icon: "🎭",
+            nav: "https://maps.app.goo.gl/81RvRei8pKzj6e1z5",
+            intro: "獨立後的芬蘭，語言不分的大都市開始有了自己的專屬歌劇演出場地，1993年在當地建成的芬蘭國家歌劇院，是芬蘭唯一的專業歌劇院，歌劇院現已經有超過150歷史，專門舉辦歌劇、芭蕾舞劇、音樂會等演出。此外，還有自己的專業管絃樂團和大概160名成員的合唱團"
+          },
+          {
+            name: "UniCafe Kaivopiha",
+            icon: "🥗",
+            nav: "https://maps.app.goo.gl/A7SoD2q5i8Yo8rD2A",
+            intro: "位於赫爾辛基市中心的熱門平價餐廳，提供9.8 歐元高性價比的午餐。該餐廳以健康的自助沙拉吧、熱食、湯品及各式素食/純素選項聞名，環境休閒舒適，適合在火車站附近尋找健康、快速且實惠用餐體驗的人群"
+          },
+          {
+            name: "FORUM百貨",
+            icon: "🛍️",
+            nav: "https://maps.app.goo.gl/6DD88EfyULt4V1jSA",
+            intro: "一座熱門的室內大型購物中心，地理位置優越，靠近中央車站。商場跨越數個樓層，匯集大量品牌店鋪、餐廳與咖啡廳，是當地人與遊客喜愛的時尚購物地標，且設有豐富的 Moomin 嚕嚕米周邊專賣店"
+          },
+          {
+            name: "Flying Tiger Copenhagen",
+            icon: "🐯",
+            nav: "https://maps.app.goo.gl/rJXF6uqrUJQZh3VR6",
+            intro: "源自丹麥哥本哈根的知名平價設計雜貨品牌，被視為「雜貨界宜家丹麥版」，店內販售商品多樣化，滿足日常生活與送禮需求。 店內動線設計如同IKEA迷宮般的體驗，讓消費者在尋寶的過程中體驗逛街樂趣"
+          },
+          {
+            name: "Stockmann百貨",
+            icon: "🏬",
+            nav: "https://maps.app.goo.gl/7SgRqQePqWuh88kq7",
+            intro: "北歐國家最大的百貨公司，該店以銷售國際知名的奢侈品牌著稱。斯托克曼時鐘位於大門處，已經成為赫爾辛基城市文化的符號，是一個受歡迎的碰面地點"
+          },
+          {
+            name: "全世界最便宜LV",
+            icon: "👜",
+            navs: [
+              {l:"第一間", u:"https://maps.app.goo.gl/q94XBw4zmRDopnbAA"},
+              {l:"第二間", u:"https://maps.app.goo.gl/RTaeeug7ai7M6LRu6"}
+            ],
+            intro: "芬蘭被譽為全世界購買Louis Vuitton最便宜的地方，主要歸因於其極高的退稅率(最高可達 17%)。雖然歐盟區定價一致，但芬蘭高額的增值稅加上便捷的退稅服務，使得退稅後的價格通常比法國更划算"
+          },
+          {
+            name: "晚餐Pho Viet",
+            icon: "🍜",
+            nav: "https://maps.app.goo.gl/t9m99uKHMPkqhofLA",
+            intro: "一家位於芬蘭赫爾辛基的著名越南料理餐廳，以道地、熱騰騰的越南河粉聞名，特別適合在寒冷的芬蘭天氣中享用。該餐廳提供多樣化的越南菜單，包括招牌牛肉河粉、雞絲河粉及春捲。其以新鮮食材和傳統烹飪手法著稱，是當地受歡迎的亞洲美食選擇"
+          },
+          {
+            name: "S-market Kasarmitori超市採買兩天早餐及伴手禮",
+            icon: "🛒",
+            nav: "https://maps.app.goo.gl/gDTBYLw4sQoCEtMH7",
+            intro:
+              "1. Fazer巧克力\n" +
+              "被譽為「芬蘭國民巧克力」，幾乎是每個到訪芬蘭的旅客必帶的伴手禮。它的特別之處在於使用純正牛奶與高品質可可調配而成，口感濃郁滑順卻不會過於甜膩，符合北歐人喜歡的「純淨自然」風味\n" +
+              "2. Nordqvisit紅茶包組\n" +
+              "芬蘭的品牌，常有嚕嚕米的聯名，可買4種紅茶組盒(草莓味、檸檬味、野莓味、藍莓馬芬口味紅茶茶包各5包)\n" +
+              "3. Lumene\n" +
+              "創立於1970年的芬蘭國民級護膚與彩妝品牌，以北歐純淨自然為核心，主打高達99%以上的天然成分，如北極泉水、雲莓與白樺樹汁。該品牌以專利技術結合極地天然資源，專注於補水、抗氧化與提升肌膚光澤，其保濕系列(Nordic Hydra)常被譽為「平價專櫃」，適合乾燥與敏感肌，是北歐風格護膚的代表\n" +
+              "4. 各種糖果餅乾"
+          },
+          {
+            name: "回Bob W Helsinki Kaarti飯店",
+            icon: "🏨",
+            nav: "https://maps.app.goo.gl/LrHxxTSFzfS9AiEbA",
+            intro: "回Bob W Helsinki Kaarti飯店"
+          }
         ]
       },
       {
-        date: "3/18", title: "塔林一日遊 🇪🇪", cities: [{n:"塔林", q:"Tallinn"}], kpArea: "赫爾辛基",
+        date: "3/18",
+        title: "塔林一日遊 🇪🇪",
+        cities: [
+          {n:"赫爾辛基", q:"Helsinki"},
+          {n:"塔林", q:"Tallinn"},
+          {n:"赫爾辛基", q:"Helsinki"}
+        ],
+        kpArea: "赫爾辛基",
         items: [
-          { name: "Luggage Room寄放行李", icon: "🎒", intro: "Bob W Kaarti一樓設有一間行李儲藏室，使用同一組密碼即可開門，裡面設有幾個附鎖的大型置物櫃。" },
-          { time: "07:00", name: "從飯店出發去West Terminal 2碼頭", icon: "🚢", nav: "https://maps.app.goo.gl/i3xDFvYGf8jJHMrw5", intro: "搭乘遊輪出發前往愛沙尼亞塔林。" },
-          { time: "09:00", name: "Eckero Line 郵輪出發", icon: "🚢", intro: "往返赫爾辛基與塔林的主要郵輪公司，以懸掛芬蘭國旗、主打北歐溫馨服務著稱。其主力渡輪「芬蘭迪亞號」(MS Finlandia)航程約2小時15分鐘，每日多班次運作，提供舒適的座位、自助餐、免稅商店、現場音樂演出，是往來芬蘭與愛沙尼亞高CP值的交通與觀光選擇。" },
-          { name: "三姊妹建築群", icon: "🏰", nav: "https://maps.app.goo.gl/WpmpynRrji72ADfJ8", intro: "愛沙尼亞首都塔林老城最著名的中世紀建築群，建於1362年，由三座相連的商人住宅組成。這三棟具有獨立山型牆的連體建築是塔林歷史的象徵，現已改建為高檔的五星級精品酒店「The Three Sisters Boutique Hotel」，保留了古色古香的歷史底蘊與獨特的結構。" },
-          { name: "聖奧拉夫教堂", icon: "⛪", nav: "https://maps.app.goo.gl/XYGwW9vUjGix5aL77", intro: "愛沙尼亞塔林舊城區，創建於12世紀，是當地著名的哥德式地標。其高聳的尖塔在16世紀曾是世界最高建築，目前仍是塔林市區最顯著的地標，也是遊客登高俯瞰塔林老城與波羅的海美景的熱門景點。" },
-          { name: "塔林城牆", icon: "🧱", nav: "https://maps.app.goo.gl/7n3AWkRC5BijWJVt6", intro: "愛沙尼亞首都塔林中世紀時期(始建於1265年)的防禦工事，也是歐洲保存最完好的防禦系統之一。其環繞舊城區，以高聳的砲塔(如「偷窺廚房」)和厚實牆體聞名，展現了漢薩同盟時期的歷史面貌，是塔林躋身世界文化遺產的核心組成部分。" },
-          { name: "帕特庫利觀景台", icon: "🏙️", nav: "https://maps.app.goo.gl/6PKhpdzzuJbmLwhb6", intro: "俯瞰中世紀舊城區紅色屋頂、古老城牆、塔樓及遠處波羅的海港口的絕佳位置。這座免費景點能拍到聖奧拉夫教堂的壯麗尖頂，景色與視野相較於鄰近的科赫圖奧薩觀景台更偏向港口與城牆結構，是遊客必訪的經典攝影點。" },
-          { name: "kohtuotsa viewing platform", icon: "🏙️", nav: "https://maps.app.goo.gl/hX55RT9DTuGMFFCi6", intro: "必須打卡網紅牆，是俯瞰塔林舊城區紅瓦屋頂、教堂尖塔、遠眺波羅的海及現代新城區的絕佳免費觀景點。該處以其開闊的視角與著名的「The Times we had」牆面塗鴉而聞名，是遊客拍攝童話般塔林全景的必訪之處。" },
-          { name: "塔林聖母主教座堂", icon: "⛪", nav: "https://maps.app.goo.gl/5KvdcpdWY1xucxt17", intro: "又稱「圓頂教堂」，位於愛沙尼亞塔林座堂山上，建於13世紀(約1219年)，是愛沙尼亞最古老且最重要的路德教派教堂。這座教堂見證了圖姆皮山丘的發展歷史，是17世紀大火後唯一的倖存建築。" },
-          { name: "塔林亞歷山大·涅夫斯基主教座堂", icon: "⛪", nav: "https://maps.app.goo.gl/WGpZxF8hexYNeiBM6", intro: "愛沙尼亞最大、最高的圓頂東正教堂，位於座堂山，建於1894至1900年沙俄統治時期。這座教堂展現了典型的俄羅斯復興式風格，以深黑色洋蔥頭穹頂和金十字架為特徵，並設有11座銅鐘，內部裝飾著豐富的馬賽克圖案，是塔林老城的重要標誌。" },
-          { name: "座堂山城堡", icon: "🏰", nav: "https://maps.app.goo.gl/85zxkvpwxsr4XmvP9", intro: "愛沙尼亞首都塔林的心臟地帶，座落於石灰岩山頂，自 13 世紀起即是統治權力的象徵，現為愛沙尼亞國會所在地。這座歷史古蹟擁有粉紅色巴洛克式外觀，並保留了高聳的赫爾曼塔，是研究波羅的海中世紀歷史與權力轉移的重要地標。" },
-          { name: "赫爾曼塔", icon: "🏰", nav: "https://maps.app.goo.gl/H11Dd55ehoNwfCEq5", intro: "位於座堂山城堡的標誌性中世紀防禦塔，始建於14世紀(1360-1370年)，後於16世紀重建。這座高46公尺的方形石塔緊鄰愛沙尼亞國會大樓，象徵國家主權，塔頂長期飄揚著愛沙尼亞國旗。它曾在多次戰火中屹立不倒，是愛沙尼亞獨立的象徵。" },
-          { name: "丹麥國王花園", icon: "🌹", nav: "https://maps.app.goo.gl/D1X5NPNB4SpobKEb8", intro: "位於愛沙尼亞首都塔林舊城區，是這座中世紀古城最具傳奇色彩的地點之一。相傳丹麥國王瓦爾德馬二世(Valdemar II)在1219年攻打愛沙尼亞異教徒時曾陷入苦戰，天空中突然降下一面紅底白十字的旗幟，並伴隨著「抓緊這面旗幟就是勝利」的聲音。隨後丹麥軍隊受此鼓舞而獲勝，這面旗幟便成為了丹麥的國旗，據信是「世界上第一面國旗」\n花園內有三座巨大的神秘「無臉僧侶」雕像，這是在2011年設計競賽中獲勝的作品，雕像分別名為「守護」、「祈求」與「給予」，旨在體現中世紀的神秘氛圍。" },
-          { name: "聖尼古拉教堂", icon: "⛪", nav: "https://maps.app.goo.gl/CQA91mJ8jJHoYk1kUA", intro: "一座始建於 13 世紀的哥德式中世紀教堂，位於愛沙尼亞塔林老城。二戰後重建，現為愛沙尼亞藝術博物館分館與音樂廳，收藏著名的《死亡之舞》等中世紀宗教藝術品，並因其音樂廳功能及欣賞老城美景的塔樓而聞名。" },
-          { name: "塔林市政廳", icon: "🏛️", nav: "https://maps.app.goo.gl/HTWt4gbmwpWmeUpHA", intro: "北歐唯一的哥德式市政廳，也是斯堪地那維亞和波羅的海國家最古老的市政廳(建立於1402-1404年)。這座兩層高的石造建築是塔林歷史的核心，其獨特之處在於屋頂簷邊有一對獨特的龍形排水口，傳說這三條古老的龍守護著塔林數百年。這些龍頭排水口與頂部的「守護者托馬斯」風向標共同構成了該建築的經典標誌。" },
-          { name: "午餐地窖餐廳 III Draakon", icon: "🍲", nav: "https://maps.app.goo.gl/cEEhU81P7fALZpXS9", intro: "傳說在愛沙尼亞有三條龍在守護著塔林，這間店的名字就是取自愛沙尼亞語中的“三條龍”，據說店內的麋鹿湯維持跟 500 年前相同的食譜配方，服務生穿著中世紀服裝，店內還能看到有趣的店規。坐下來品嚐麋鹿湯、蘋果派等特色食物。" },
-          { name: "聖凱瑟琳通道", icon: "🧱", nav: "https://maps.app.goo.gl/yizg1yv47Qj49Mpv5", intro: "愛沙尼亞塔林老城區最浪漫、最具中世紀風情的窄巷，這條以石牆堆砌的巷弄擁有獨特的跨拱建築，展示著古老的聖凱瑟琳修道院遺跡與中世紀墓碑，如今聚集了許多傳統手工藝作坊與咖啡廳，是體驗中世紀氛圍的熱門拍照景點。" },
-          { name: "維魯門", icon: "🧱", nav: "https://maps.app.goo.gl/ugfsk3BfTHSPcgPT8", intro: "愛沙尼亞塔林舊城區最具代表性的中世紀入口，由兩座建於 14 世紀的常春藤覆蓋石塔組成。這座古老的城門連接現代化市區與充滿童話氛圍的舊城，是遊客進入舊城主要購物街的起點，也是著名的熱門拍照點與觀光地標。" },
-          { time: "17:15", name: "A-terminal 碼頭", icon: "🚢", nav: "https://maps.app.goo.gl/jzpF5cKAPYjMQVR26", intro: "搭乘遊輪返回芬蘭赫爾辛基。" },
-          { time: "18:30", name: "郵輪回程赫爾辛基", icon: "🚢", intro: "回程郵輪，休息片刻，21:00抵達芬蘭赫爾辛基。" },
-          { name: "Luggage Room拿行李", icon: "🎒", nav: "https://maps.app.goo.gl/LrHxxTSFzfS9AiEbA", intro: "Bob W Kaarti一樓拿行李。" },
-          { name: "交通教學：前往機場", icon: "🚌", type: "guide", transport: "於中央車站搭乘火車 P/I 線前往機場，車程30分。", intro: "準備回國之旅。" }
+          {
+            name: "Luggage Room寄放行李",
+            icon: "🎒",
+            intro: "雖然晚上一樣是住同一間飯店，但是因為是不同房型，所以需要先Check-out"
+          },
+          { time: "07:45", name: "到West Terminal 2碼頭", icon: "🚶‍♀️", nav: "https://maps.app.goo.gl/i3xDFvYGf8jJHMrw5", intro: "07:45到West Terminal 2碼頭" },
+          {
+            time: "09:00",
+            name: "乘坐Eckero Line郵輪出發前往塔林",
+            icon: "🚢",
+            intro: "往返赫爾辛基與塔林的主要郵輪公司，以懸掛芬蘭國旗、主打北歐溫馨服務著稱。其主力渡輪「芬蘭迪亞號」(MS Finlandia)航程約2小時15分鐘，每日多班次運作，提供舒適的座位、自助餐、免稅商店、現場音樂演出，是往來芬蘭與愛沙尼亞高CP值的交通與觀光選擇"
+          },
+          { name: "三姊妹建築群", icon: "🏰", nav: "https://maps.app.goo.gl/WpmpynRrji72ADfJ8", intro: "愛沙尼亞首都塔林老城最著名的中世紀建築群，建於1362年，由三座相連的商人住宅組成。這三棟具有獨立山型牆的連體建築是塔林歷史的象徵，現已改建為高檔的五星級精品酒店「The Three Sisters Boutique Hotel」，保留了古色古香的歷史底蘊與獨特的結構" },
+          { name: "聖奧拉夫教堂", icon: "⛪", nav: "https://maps.app.goo.gl/XYGwW9vUjGix5aL77", intro: "位於愛沙尼亞塔林舊城區，創建於12世紀，是當地著名的哥德式地標。其高聳的尖塔在16世紀曾是世界最高建築，目前仍是塔林市區最顯著的地標，也是遊客登高俯瞰塔林老城與波羅的海美景的熱門景點" },
+          { name: "塔林城牆", icon: "🧱", nav: "https://maps.app.goo.gl/7n3AWkRC5BijWJVt6", intro: "愛沙尼亞首都塔林中世紀時期(始建於1265年)的防禦工事，也是歐洲保存最完好的防禦系統之一。其環繞舊城區，以高聳的砲塔(如「偷窺廚房」)和厚實牆體聞名，展現了漢薩同盟時期的歷史面貌，是塔林躋身世界文化遺產的核心組成部分" },
+          { name: "帕特庫利觀景台", icon: "🏙️", nav: "https://maps.app.goo.gl/6PKhpdzzuJbmLwhb6", intro: "俯瞰中世紀舊城區紅色屋頂、古老城牆、塔樓及遠處波羅的海港口的絕佳位置。這座免費景點能拍到聖奧拉夫教堂的壯麗尖頂，景色與視野相較於鄰近的科赫圖奧薩觀景台更偏向港口與城牆結構，是遊客必訪的經典攝影點" },
+          { name: "kohtuotsa viewing platform", icon: "🏙️", nav: "https://maps.app.goo.gl/hX55RT9DTuGMFFCi6", intro: "必須打卡網紅牆，是俯瞰塔林舊城區紅瓦屋頂、教堂尖塔、遠眺波羅的海及現代新城區的絕佳免費觀景點。該處以其開闊的視角和著名的「The Times we had」牆面塗鴉而聞名，是遊客拍攝童話般塔林全景的必訪之處" },
+          { name: "塔林聖母主教座堂", icon: "⛪", nav: "https://maps.app.goo.gl/5KvdcpdWY1xucxt17", intro: "又稱「圓頂教堂」，位於愛沙尼亞塔林座堂山上，建於13世紀(約1219年)，是愛沙尼亞最古老且最重要的路德教派教堂。這座教堂見證了圖姆皮山丘的發展歷史，是17世紀大火後唯一的倖存建築" },
+          { name: "塔林亞歷山大·涅夫斯基主教座堂", icon: "⛪", nav: "https://maps.app.goo.gl/WGpZxF8hexYNeiBM6", intro: "愛沙尼亞最大、最高的圓頂東正教堂，位於座堂山，建於1894至1900年沙俄統治時期。這座教堂展現了典型的俄羅斯復興式風格，以深黑色洋蔥頭穹頂和金十字架為特徵，並設有11座銅鐘，內部装饰著豐富的馬賽克圖案，是塔林老城的重要標誌" },
+          { name: "座堂山城堡", icon: "🏰", nav: "https://maps.app.goo.gl/85zxkvpwxsr4XmvP9", intro: "愛沙尼亞首都塔林的心臟地帶，座落於石灰岩山頂，自 13 世紀起即是統治權力的象徵，現為愛沙尼亞國會所在地。這座歷史古蹟擁有粉紅色巴洛克式外觀，並保留了高聳的赫爾曼塔，是研究波羅的海中世紀歷史與權力轉移的重要地標" },
+          { name: "赫爾曼塔", icon: "🏰", nav: "https://maps.app.goo.gl/H11Dd55ehoNwfCEq5", intro: "位於座堂山城堡的標誌性中世紀防禦塔，始建於14世紀(1360-1370年)，後於16世紀重建。這座高46公尺的方形石塔緊鄰愛沙尼亞國會大樓，象徵國家主權，塔頂長期飄揚著愛沙尼亞國旗。它曾在多次戰火中屹立不倒，是愛沙尼亞獨立的象徵" },
+          { name: "丹麥國王花園", icon: "🌹", nav: "https://maps.app.goo.gl/D1X5NPNB4SpobKEb8", intro: "位於愛沙尼亞首都塔林舊城區，是這座中世紀古城最具傳奇色彩的地點之一。相傳丹麥國王瓦爾德馬二世(Valdemar II)在1219年攻打愛沙尼亞異教徒時曾陷入苦戰，天空中突然降下一面紅底白十字的旗幟，並伴隨著「抓緊這面旗幟就是勝利」的聲音。隨後丹麥軍隊受此鼓舞而獲勝，這面旗幟便成為了丹麥的國旗，據信是「世界上第一面國旗」\n花園內有三座巨大的神秘「無臉僧侶」雕像，這是在2011年設計競賽中獲勝的作品，雕像分別名為「守護」、「祈求」與「給予」，旨在體現中世紀的神秘氛圍" },
+          { name: "聖尼古拉教堂", icon: "⛪", nav: "https://maps.app.goo.gl/CQA91mJ8jHoYk1kUA", intro: "一座始建於 13 世紀的哥德式中世紀教堂，位於愛沙尼亞塔林老城。二戰後重建，現為愛沙尼亞藝術博物館分館與音樂廳，收藏著名的《死亡之舞》等中世紀宗教藝術品，並因其音樂廳功能及欣賞老城美景的塔樓而聞名" },
+          { name: "塔林市政廳", icon: "🏛️", nav: "https://maps.app.goo.gl/HTWt4gbmwpWmeUpHA", intro: "北歐唯一的哥德式市政廳，也是斯堪地那維亞和波羅的海國家最古老的市政廳(建立於1402-1404年)。這座兩層高的石造建築是塔林歷史的核心，其獨特之處在於屋頂簷邊有一對獨特的龍形排水口，傳說這三條古老的龍守護著塔林數百年。這些龍頭排水口與頂部的「守護者托馬斯」風向標共同構成了該建築的經典標誌" },
+          { name: "午餐地窖餐廳III Draakon", icon: "🍲", nav: "https://maps.app.goo.gl/cEEhU81P7fALZpXS9", intro: "傳說在愛沙尼亞有三條龍在守護著塔林，這間店的名字就是取自愛沙尼亞語中的“三條龍”，據說店內的麋鹿湯維持跟 500 年前相同的食譜配方，服務生穿著中世紀服裝，店內還能看到有趣的店規。坐下來品嚐麋鹿湯、蘋果派等特色食物" },
+          { name: "聖凱瑟琳通道", icon: "🧱", nav: "https://maps.app.goo.gl/yizg1yv47Qj49Mpv5", intro: "愛沙尼亞塔林老城區最浪漫、最具中世紀風情的窄巷，這條以石牆堆砌的巷弄擁有獨特的跨拱建築，展示著古老的聖凱瑟琳修道院遺跡與中世紀墓碑，如今聚集了許多傳統手工藝作坊與咖啡廳，是體驗中世紀氛圍的熱門拍照景點" },
+          { name: "維魯門", icon: "🧱", nav: "https://maps.app.goo.gl/ugfsk3BfTHSPcgPT8", intro: "愛沙尼亞塔林舊城區最具代表性的中世紀入口，由兩座建於 14 世紀的常春藤覆蓋石塔組成。這座古老的城門連接現代化市區與充滿童話氛圍的舊城，是遊客進入舊城主要購物街的起點，也是著名的熱門拍照點與觀光地標" },
+          { time: "17:15", name: "到A-terminal碼頭", icon: "🚢", nav: "https://maps.app.goo.gl/jzpF5cKAPYjMQVR26", intro: "17:15到A-terminal碼頭" },
+          { time: "18:30", name: "郵輪出發回赫爾辛基", icon: "🚢", intro: "乘坐Eckero Line郵輪18:30出發前往赫爾辛基" },
+          { time: "21:00", name: "抵達赫爾辛基", icon: "🌙", intro: "晚上9點抵達赫爾辛基" },
+          {
+            name: "Luggage Room取行李",
+            icon: "🎒",
+            nav: "https://maps.app.goo.gl/LrHxxTSFzfS9AiEbA",
+            intro: "Check-in另外一間房型"
+          }
         ]
       },
       {
-        date: "3/19", title: "返程 Day 1 ✈️", cities: [{n:"赫爾辛基", q:"Helsinki"}, {n:"哥本哈根", q:"Copenhagen"}], kpArea: "赫爾辛基",
+        date: "3/19",
+        title: "結束極光之旅 🌌",
+        cities: [
+          {n:"赫爾辛基", q:"Helsinki"},
+          {n:"曼谷", q:"Bangkok"}
+        ],
+        kpArea: "曼谷",
         items: [
-          { time: "06:15", name: "SK1705 赫爾辛基 ✈️ 哥本哈根", icon: "✈️", type: "flight", intro: "抵達哥本哈根 T3。必買特色伴手禮包括皇家哥本哈根名瓷 (Royal Copenhagen)：經典的丹麥藍色唐草瓷器、Jacobsens印有安徒生童話的丹麥奶油酥餅/餅乾、Summerbird丹麥手工巧克力。", detail: "06:15出發 → 07:05抵達 CPH T3。" }
+          {
+            name: "從市區到機場",
+            icon: "🧳",
+            transport:
+              "🚆 赫爾辛基市區 → 機場（HEL）\n" +
+              "1) 於中央車站搭乘火車 P/I 線前往機場\n" +
+              "2) 依現場指標走到航廈\n" +
+              "3) 抵達後依照航班資訊辦理報到與託運",
+            intro: "享用早餐之後10點Checkout前往機場(教學列出怎麼坐車去機場)"
+          },
+          {
+            time: "13:50",
+            name: "AY141 赫爾辛基 ✈️ 曼谷 (芬蘭航空)",
+            icon: "✈️",
+            type: "flight",
+            highlight: "這裡特別幫我highlight：行李好像沒有直掛，所以需要取出行李入境之後先寄放行李(列出教學哪裡寄放)",
+            intro: "13:50搭乘芬蘭航空出發→BKK 3/20 06:05抵達泰國曼谷素萬那普機場(這裡特別幫我highlight：行李好像沒有直掛，所以需要取出行李入境之後先寄放行李(列出教學哪裡寄放)(景點介紹：泰國最繁忙的國際航空樞紐，也是東南亞最大的機場之一，於2006年9月正式啟用，取代了舊有的廊曼機場成為曼谷的主要國際機場)",
+            detail:
+              "AY141｜13:50 出發（HEL）→ BKK 3/20 06:05 抵達（素萬那普）\n\n" +
+              "🧳 BKK 行李&寄放（教學）\n" +
+              "1) 抵達後先依指標前往行李轉盤領行李（如果未直掛）\n" +
+              "2) 入境後找「Left Luggage / Luggage Storage」\n" +
+              "3) 依現場指標或服務台指引前往寄放點"
+          }
         ]
       },
       {
-        date: "3/20", title: "返程 Day 2 🇹🇼", cities: [{n:"哥本哈根", q:"Copenhagen"}, {n:"阿布達比", q:"Abu+Dhabi"}, {n:"桃園", q:"Taoyuan"}], kpArea: "桃園",
+        date: "3/20",
+        title: "回台灣 🇹🇼",
+        cities: [
+          {n:"曼谷", q:"Bangkok"},
+          {n:"桃園", q:"Taoyuan"}
+        ],
+        kpArea: "桃園",
         items: [
-          { time: "10:00", name: "EY178 哥本哈根 ✈️ 阿布達比", icon: "✈️", type: "flight", transport: "從第3航廈到第2航廈：步行約10分鐘即可抵達。", intro: "抵達阿布達比 A 航廈。轉機推薦購買 Bateel 椰棗與駱駝奶巧克力。", detail: "10:00出發 → AUH 19:30抵達 (A航廈)。" },
-          { time: "20:55", name: "EY898 阿布達比 ✈️ 桃園", icon: "✈️", type: "flight", intro: "08:30 抵達桃園 T2。", detail: "20:55出發 → 08:30抵達 TPE。" }
+          {
+            time: "06:05",
+            name: "抵達曼谷素萬那普機場",
+            icon: "🇹🇭",
+            highlight: "這裡特別幫我highlight：行李好像沒有直掛，所以需要取出行李入境之後辦理登機",
+            intro: "13:50搭乘芬蘭航空出發→BKK 3/20 06:05抵達泰國曼谷素萬那普機場(這裡特別幫我highlight：行李好像沒有直掛，所以需要取出行李入境之後辦理登機→Magic food point 機場奇蹟美食街享用平價的泰式美食(景點介紹：詳細位置：素萬那普機場1樓，8號出口旁\n經典的泰式炒河粉、芒果糯米飯、手標奶茶等等，美食街使用使用泰銖現金儲值卡消費，建議一人儲值200泰銖，如未用完可退餘額)→泰國素萬那普機場必買(景點介紹：\nKing Power Duty Free 集中在出境後的中間區域(D1~D8登機門)\n    1. 泰國最夯吉祥物「ButterBear 奶油小熊」\n東區、靠近C登機門的「King Power Duty Free」推出了 機場限定的曲奇禮盒、玩偶、鑰匙圈\n    2. Doi Kham皇家牌蜂蜜： 軟管設計，方便攜帶\n    3. 各式果乾： 芒果乾、榴槤乾、椰卷片\n    4. FF番茄餅乾： Jisoo也愛的熱門零食\n    5. Scents of Thailand專區有 THANN、HARNN、PANPURI 等知名品牌)"
+          },
+          {
+            name: "Magic food point 機場奇蹟美食街",
+            icon: "🍜",
+            intro: "詳細位置：素萬那普機場1樓，8號出口旁\n經典的泰式炒河粉、芒果糯米飯、手標奶茶等等，美食街使用使用泰銖現金儲值卡消費，建議一人儲值200泰銖，如未用完可退餘額"
+          },
+          {
+            name: "泰國素萬那普機場必買",
+            icon: "🛍️",
+            intro:
+              "King Power Duty Free 集中在出境後的中間區域(D1~D8登機門)\n" +
+              "    1. 泰國最夯吉祥物「ButterBear 奶油小熊」\n" +
+              "東區、靠近C登機門的「King Power Duty Free」推出了 機場限定的曲奇禮盒、玩偶、鑰匙圈\n" +
+              "    2. Doi Kham皇家牌蜂蜜： 軟管設計，方便攜帶\n" +
+              "    3. 各式果乾： 芒果乾、榴槤乾、椰卷片\n" +
+              "    4. FF番茄餅乾： Jisoo也愛的熱門零食\n" +
+              "    5. Scents of Thailand專區有 THANN、HARNN、PANPURI 等知名品牌"
+          },
+          {
+            time: "12:50",
+            name: "TG634 曼谷 ✈️ 桃園 (泰國國際航空)",
+            icon: "✈️",
+            type: "flight",
+            intro: "BKK 12:50搭乘泰國國際航空出發→17:20抵達桃園機場第1航廈",
+            detail: "TG634｜12:50 出發（BKK）→ 17:20 抵達（桃園機場第1航廈）"
+          }
         ]
       }
     ];
@@ -301,6 +827,9 @@
 
       const [headerH, setHeaderH] = useState(150);
       const [bottomH, setBottomH] = useState(140);
+
+      const [noticeTab, setNoticeTab] = useState('fin');
+      const [taxTab, setTaxTab] = useState('fin');
 
       const currDay = ITINERARY[day];
 
@@ -359,7 +888,6 @@
         setAmt('');
       };
 
-      /* ✅✅ 改這段：用 ResizeObserver 追蹤 header/bottom 真實高度（字型載入、換行、網址列變動都會更新） */
       useLayoutEffect(() => {
         const headerEl = headerRef.current;
         const bottomEl = bottomRef.current;
@@ -375,15 +903,13 @@
         ro.observe(headerEl);
         ro.observe(bottomEl);
 
-        // 先量一次（避免第一次 render padding 不夠）
         const h0 = headerEl.getBoundingClientRect().height || 0;
         const b0 = bottomEl.getBoundingClientRect().height || 0;
         setHeaderH(Math.max(120, Math.round(h0)));
         setBottomH(Math.max(110, Math.round(b0)));
 
         return () => ro.disconnect();
-      }, [view, day, records.length]);
-      /* ✅✅ end */
+      }, [view, day, records.length, noticeTab, taxTab]);
 
       useEffect(() => {
         const el = mainRef.current;
@@ -417,7 +943,12 @@
           try { lucide.createIcons(); } catch(e) {}
         }, 60);
         return () => clearTimeout(t);
-      }, [view, day, records.length]);
+      }, [view, day, records.length, noticeTab, taxTab]);
+
+      const renderIntro = (text) => {
+        if (!text) return null;
+        return <span className="whitespace-pre-wrap leading-loose break-words">{text}</span>;
+      };
 
       if (view === 'cover') return (
         <div className="h-full w-full relative flex items-center justify-center text-white overflow-hidden">
@@ -460,11 +991,12 @@
 
             {view === 'itinerary' && (
               <div className="text-right space-y-3 shrink-0">
-                {currDay.cities.map(c => (
+                {currDay.cities.map((c, idx) => (
                   <button
-                    key={c.n}
+                    key={c.n + idx}
                     onClick={() => window.open(`https://www.google.com/search?q=${c.q}+weather`)}
                     className="block text-lg bg-sky-50 text-sky-600 px-4 py-2 rounded-full border border-sky-100 font-black italic underline"
+                    title="點擊查看 Google 天氣"
                   >
                     🌤️ {c.n}
                   </button>
@@ -485,15 +1017,6 @@
           >
             {view === 'itinerary' && (
               <div className="space-y-6">
-                {currDay.reminders && (
-                  <div className="bg-sky-100 text-sky-900 p-8 rounded-[45px] shadow-sm border-2 border-sky-200 overflow-x-hidden">
-                    <h3 className="text-2xl font-black mb-3 flex items-center gap-2">📌 行前提醒</h3>
-                    {currDay.reminders.map((r, ri) => (
-                      <p key={ri} className="text-xl font-black italic opacity-90 leading-relaxed mb-1">・{r}</p>
-                    ))}
-                  </div>
-                )}
-
                 {currDay.items.map((it, i) => (
                   <div key={i} className="item-card overflow-x-hidden">
                     {it.time && (
@@ -509,10 +1032,8 @@
                         <div
                           onClick={() => setModal(it)}
                           className="text-3xl font-black text-slate-700 cursor-pointer leading-snug break-words"
+                          title="點擊看景點介紹/教學/詳細資訊"
                         >
-                          {it.name && it.name.includes("住宿") && (
-                            <span className="bg-pink-100 text-pink-600 px-3 py-1 rounded-2xl mr-2 italic text-2xl">住宿</span>
-                          )}
                           {it.name}
                         </div>
 
@@ -645,77 +1166,146 @@
 
             {view === 'notice' && (
               <div className="space-y-8 px-2 overflow-x-hidden">
-                <div className="info-card">
-                  <h4 className="text-3xl font-black text-blue-600 mb-4 underline decoration-blue-100">⚡ 1. 電壓與插頭</h4>
-                  <p className="text-2xl font-black italic leading-loose text-slate-700">芬蘭的電壓是220-240V，插頭屬於兩腳圓型，要記得帶轉接插頭。</p>
+                {/* Tabs */}
+                <div className="bg-white p-4 rounded-[40px] border-2 border-slate-100 shadow-sm flex gap-3">
+                  <button
+                    onClick={()=>setNoticeTab('kr')}
+                    className={`flex-1 py-4 rounded-[28px] font-black text-2xl btn-cute italic ${noticeTab==='kr' ? 'bg-blue-600 text-white' : 'bg-slate-50 text-slate-400'}`}
+                  >
+                    🇰🇷 首爾
+                  </button>
+                  <button
+                    onClick={()=>setNoticeTab('fin')}
+                    className={`flex-1 py-4 rounded-[28px] font-black text-2xl btn-cute italic ${noticeTab==='fin' ? 'bg-blue-600 text-white' : 'bg-slate-50 text-slate-400'}`}
+                  >
+                    🇫🇮 芬蘭
+                  </button>
                 </div>
-                <div className="info-card">
-                  <h4 className="text-3xl font-black text-blue-600 mb-4 underline decoration-blue-100">💧 2. 飲用水</h4>
-                  <p className="text-2xl font-black italic leading-loose text-slate-700">水龍頭的水可直接飲用，餐廳通常提供免費的水。</p>
-                </div>
-                <div className="info-card">
-                  <h4 className="text-3xl font-black text-blue-600 mb-4 underline decoration-blue-100">⏰ 3. 時差</h4>
-                  <p className="text-2xl font-black italic leading-loose text-slate-700">芬蘭冬季慢台灣6小時。</p>
-                </div>
-                <div className="info-card border-l-red-400">
-                  <h4 className="text-3xl font-black text-red-600 mb-4 underline decoration-red-100">🆘 4. 緊急電話</h4>
-                  <p className="text-2xl font-black italic leading-loose text-slate-700">緊急求助電話為 112。</p>
-                </div>
-                <div className="info-card">
-                  <h4 className="text-3xl font-black text-blue-600 mb-4 underline decoration-blue-100">💶 5. 貨幣與歐元</h4>
-                  <p className="text-xl font-black italic leading-loose text-slate-700">芬蘭是北歐國家中唯一使用歐元的國家，愛沙尼亞也是使用歐元。</p>
-                  <p className="text-lg text-slate-400 font-black italic mt-2">(瑞典、丹麥、挪威和冰島都是用自己國家的克朗)</p>
-                </div>
+
+                {noticeTab === 'kr' ? (
+                  <>
+                    <div className="info-card">
+                      <h4 className="text-3xl font-black text-blue-600 mb-4 underline decoration-blue-100">🧾 1. 電子入境卡</h4>
+                      <p className="text-2xl font-black italic leading-loose text-slate-700">自2025年2月24日起，韓國正式實施「電子入境卡」制度，過韓國海關時掃描 QR code</p>
+                    </div>
+                    <div className="info-card">
+                      <h4 className="text-3xl font-black text-blue-600 mb-4 underline decoration-blue-100">🔋 2. 行動電源規定</h4>
+                      <p className="text-2xl font-black italic leading-loose text-slate-700">行動電源要有「Wh」標籤，需要貼上絕緣膠帶、個別放入塑膠/保護袋中、蓋上充電端保護蓋</p>
+                    </div>
+                    <div className="info-card border-l-red-400">
+                      <h4 className="text-3xl font-black text-red-600 mb-4 underline decoration-red-100">🚫 3. 違禁藥品</h4>
+                      <p className="text-2xl font-black italic leading-loose text-slate-700">EVE止痛藥、感冒藥等被歸類為「違禁藥品」</p>
+                    </div>
+                    <div className="info-card">
+                      <h4 className="text-3xl font-black text-blue-600 mb-4 underline decoration-blue-100">💵 4. 換錢</h4>
+                      <p className="text-2xl font-black italic leading-loose text-slate-700">部分商家僅收現金，可到弘大地鐵7號出口的Money Box換錢所兌換小額韓幣</p>
+                      <button
+                        onClick={() => window.open("https://naver.me/xUt8tQ2a")}
+                        className="mt-4 bg-blue-500 text-white px-6 py-3 rounded-2xl text-2xl font-black btn-cute italic whitespace-nowrap flex items-center justify-center gap-2"
+                      >
+                        📍 導航
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="info-card">
+                      <h4 className="text-3xl font-black text-blue-600 mb-4 underline decoration-blue-100">⚡ 1. 電壓與插頭</h4>
+                      <p className="text-2xl font-black italic leading-loose text-slate-700">芬蘭的電壓是220-240V，插頭屬於兩腳圓型，要記得帶轉接插頭</p>
+                    </div>
+                    <div className="info-card">
+                      <h4 className="text-3xl font-black text-blue-600 mb-4 underline decoration-blue-100">💧 2. 飲用水</h4>
+                      <p className="text-2xl font-black italic leading-loose text-slate-700">水龍頭的水可直接飲用，餐廳通常提供免費的水</p>
+                    </div>
+                    <div className="info-card">
+                      <h4 className="text-3xl font-black text-blue-600 mb-4 underline decoration-blue-100">⏰ 3. 時差</h4>
+                      <p className="text-2xl font-black italic leading-loose text-slate-700">芬蘭冬季慢台灣6小時</p>
+                    </div>
+                    <div className="info-card border-l-red-400">
+                      <h4 className="text-3xl font-black text-red-600 mb-4 underline decoration-red-100">🆘 4. 緊急電話</h4>
+                      <p className="text-2xl font-black italic leading-loose text-slate-700">緊急求助電話為 112</p>
+                    </div>
+                    <div className="info-card">
+                      <h4 className="text-3xl font-black text-blue-600 mb-4 underline decoration-blue-100">💶 5. 貨幣與歐元</h4>
+                      <p className="text-2xl font-black italic leading-loose text-slate-700">芬蘭是北歐國家中唯一使用歐元的國家，像是瑞典、丹麥、挪威和冰島都是用自己國家的克朗，愛沙尼亞也是使用歐元</p>
+                    </div>
+                  </>
+                )}
               </div>
             )}
 
             {view === 'tax' && (
               <div className="space-y-8 px-2 overflow-x-hidden">
-                <div className="info-card border-l-red-400">
-                  <h4 className="text-3xl font-black text-red-600 mb-4">📝 1. 索取稅單</h4>
-                  <p className="text-2xl font-black italic leading-loose text-slate-700">
-                    購物需主動向店員索取退稅單，務必檢查國籍(台灣的ISO標準國家代碼是158)、姓名、品項、退稅金額是否正確
-                  </p>
+                {/* Tabs */}
+                <div className="bg-white p-4 rounded-[40px] border-2 border-slate-100 shadow-sm flex gap-3">
+                  <button
+                    onClick={()=>setTaxTab('kr')}
+                    className={`flex-1 py-4 rounded-[28px] font-black text-2xl btn-cute italic ${taxTab==='kr' ? 'bg-blue-600 text-white' : 'bg-slate-50 text-slate-400'}`}
+                  >
+                    🇰🇷 首爾
+                  </button>
+                  <button
+                    onClick={()=>setTaxTab('fin')}
+                    className={`flex-1 py-4 rounded-[28px] font-black text-2xl btn-cute italic ${taxTab==='fin' ? 'bg-blue-600 text-white' : 'bg-slate-50 text-slate-400'}`}
+                  >
+                    🇫🇮 芬蘭
+                  </button>
                 </div>
 
-                <div className="info-card border-l-blue-400">
-                  <h4 className="text-3xl font-black text-blue-600 mb-4">💰 2. 退稅門檻</h4>
-                  <p className="text-2xl font-black italic leading-loose text-slate-700">
-                    建議湊到40歐元退稅門檻，並在機場辦理退稅(建議退信用卡)
-                  </p>
-                </div>
+                {taxTab === 'kr' ? (
+                  <>
+                    <div className="info-card border-l-red-400">
+                      <h4 className="text-3xl font-black text-red-600 mb-4">🧾 1. 索取退稅單據</h4>
+                      <p className="text-2xl font-black italic leading-loose text-slate-700">購買含稅商品15,000韓幣，向店家索取退稅單據(有TAX FREE字樣，非一般收據)</p>
+                    </div>
+                    <div className="info-card border-l-blue-400">
+                      <h4 className="text-3xl font-black text-blue-600 mb-4">🛫 2. 出境退稅</h4>
+                      <p className="text-2xl font-black italic leading-loose text-slate-700">於出境時攜帶「退稅單據」、「購物收據」和「購買的物品」(未拆封、未使用)，在海關櫃檯蓋退稅章後，於出境管制區取得退稅款</p>
+                    </div>
+                    <div className="info-card border-l-orange-400">
+                      <h4 className="text-3xl font-black text-orange-600 mb-4">🧾 3. 海關申報門檻</h4>
+                      <p className="text-2xl font-black italic leading-loose text-slate-700">若金額超過75,000韓幣，需要到海關申報櫃檯辦理</p>
+                      <p className="text-2xl font-black italic leading-loose text-slate-700">若金額未達75,000韓幣，可以使用自助退稅機台辦理</p>
+                    </div>
+                    <div className="info-card">
+                      <h4 className="text-3xl font-black text-blue-600 mb-4">🖥️ 4. 自助退稅機位置</h4>
+                      <p className="text-2xl font-black italic leading-loose text-slate-700">在航空公司報到櫃檯編號F跟Ｈ的側邊，就可以看到退稅機，退稅機的對面，就是「海關申報」</p>
+                    </div>
+                    <div className="info-card border-l-red-400">
+                      <h4 className="text-3xl font-black text-red-600 mb-4">🔎 5. 標記「Ｘ」單據</h4>
+                      <p className="text-2xl font-black italic leading-loose text-slate-700">欄位標記「Ｘ」的單據，就要帶著所購買的商品(未拆封、未使用)，去對面的「海關申報」櫃檯查驗</p>
+                    </div>
+                    <div className="info-card">
+                      <h4 className="text-3xl font-black text-blue-600 mb-4">💵 6. 取現櫃檯</h4>
+                      <p className="text-2xl font-black italic leading-loose text-slate-700">在249登機門的對面，就可以看到退稅取現櫃檯，可以直接使用機器拿到韓幣現鈔</p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="info-card border-l-red-400">
+                      <h4 className="text-3xl font-black text-red-600 mb-4">📝 1. 索取稅單</h4>
+                      <p className="text-2xl font-black italic leading-loose text-slate-700">購物需主動向店員索取退稅單(務必檢查國籍(台灣的ISO標準國家代碼是158)、姓名、品項、退稅金額是否正確)</p>
+                    </div>
 
-                <div className="bg-red-50 p-8 rounded-[50px] border-4 border-red-100 shadow-sm overflow-x-hidden">
-                  <h4 className="text-3xl font-black text-red-600 mb-5 flex items-center gap-2 italic underline">⚠️ 3. 注意</h4>
-                  <p className="text-2xl font-black italic leading-relaxed text-red-800">
-                    托運行李→芬蘭辦理<br/>
-                    手提行李→丹麥辦理
-                  </p>
-                </div>
+                    <div className="info-card border-l-blue-400">
+                      <h4 className="text-3xl font-black text-blue-600 mb-4">💰 2. 退稅門檻</h4>
+                      <p className="text-2xl font-black italic leading-loose text-slate-700">建議湊到40歐元退稅門檻，並在機場辦理退稅(建議退信用卡)</p>
+                    </div>
 
-                <div className="info-card border-l-orange-400">
-                  <h4 className="text-3xl font-black text-orange-600 mb-4">🧳 4. 托運行李 (芬蘭)</h4>
-                  <p className="text-2xl font-black italic leading-loose text-slate-700">
-                    24小時開放的Customs Export Clearance service point位於抵達大廳(Arrivals hall) 附近，取得並填寫好退稅單，若無人在場可使用櫃檯電話聯繫海關蓋章。海關查驗護照、機票及未拆封商品後會蓋章
-                  </p>
-                </div>
+                    <div className="info-card border-l-orange-400">
+                      <h4 className="text-3xl font-black text-orange-600 mb-4">🧳 3. 托運行李 (芬蘭)</h4>
+                      <p className="text-2xl font-black italic leading-loose text-slate-700">24小時開放的Customs Export Clearance service point位於抵達大廳(Arrivals hall) 附近，取得並填寫好退稅單，若無人在場可使用櫃檯電話聯繫海關蓋章。海關查驗護照、機票及未拆封商品後會蓋章</p>
+                    </div>
 
-                <div className="info-card border-l-orange-400">
-                  <h4 className="text-3xl font-black text-orange-600 mb-4">📪 5. 投遞退稅單</h4>
-                  <p className="text-2xl font-black italic leading-loose text-slate-700 mb-6">
-                    過安檢後，在13、29、50號登機口找到Global Blue Tax Free Refund Box，退稅信封在信箱左右側，將蓋過海關章退稅單放入信封後投入信箱
-                  </p>
-                  <p className="bg-yellow-50 p-6 rounded-3xl text-red-600 text-2xl font-black italic border-2 border-yellow-100 shadow-inner">
-                    建議投遞前，將稅單與退稅程序完整錄影或拍照存證
-                  </p>
-                </div>
-
-                <div className="info-card border-l-orange-400">
-                  <h4 className="text-3xl font-black text-orange-600 mb-4">🎒 6. 手提行李 (丹麥)</h4>
-                  <p className="text-2xl font-black italic leading-loose text-slate-700">
-                    丹麥哥本哈根機場T3跟T2中間的聯通道，約在7-11旁會看到Global Blue的櫃檯，可以處理Global Blue的稅單，若人員不在，可以自行在機器退稅
-                  </p>
-                </div>
+                    <div className="info-card border-l-orange-400">
+                      <div className="mb-5 bg-red-50 border-2 border-red-100 rounded-[28px] px-5 py-4 text-red-600 text-2xl font-black italic leading-loose">
+                        [建議投遞前，將稅單與退稅程序完整錄影或拍照存證]
+                      </div>
+                      <h4 className="text-3xl font-black text-orange-600 mb-4">📪 4. 投遞退稅單</h4>
+                      <p className="text-2xl font-black italic leading-loose text-slate-700">過安檢後，在13、29、50號登機口找到Global Blue Tax Free Refund Box，退稅信封在信箱左右側，將蓋過海關章退稅單放入信封後投入信箱，</p>
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -762,17 +1352,27 @@
                 </h3>
 
                 <div className="modal-body intro-scroll text-slate-600">
+                  {modal.highlight && (
+                    <div className="p-6 bg-red-50 rounded-[40px] border-4 border-red-100 text-red-600 text-2xl font-black italic leading-relaxed break-words mb-6 whitespace-pre-wrap">
+                      {modal.highlight}
+                    </div>
+                  )}
+
                   {modal.transport && (
-                    <div className="p-6 bg-sky-50 rounded-[40px] border-4 border-sky-100 text-sky-800 text-2xl font-black italic leading-relaxed break-words mb-6">
+                    <div className="p-6 bg-sky-50 rounded-[40px] border-4 border-sky-100 text-sky-800 text-2xl font-black italic leading-relaxed break-words mb-6 whitespace-pre-wrap">
                       💡 教學：<br/>{modal.transport}
                     </div>
                   )}
+
                   {modal.detail && (
-                    <div className="text-xl font-black text-slate-400 border-b-4 pb-4 italic uppercase tracking-widest leading-loose break-words mb-6">
+                    <div className="text-xl font-black text-slate-400 border-b-4 pb-4 italic uppercase tracking-widest leading-loose break-words mb-6 whitespace-pre-wrap">
                       詳情：<br/>{modal.detail}
                     </div>
                   )}
-                  <p className="font-black italic whitespace-pre-wrap leading-loose break-words">{modal.intro}</p>
+
+                  <div className="font-black italic">
+                    {renderIntro(modal.intro)}
+                  </div>
                 </div>
 
                 <button

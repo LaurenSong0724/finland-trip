@@ -30,7 +30,6 @@
       user-select: none;
       line-height: 1.8;
       color: #1e293b;
-
       overflow: hidden;
     }
 
@@ -128,6 +127,18 @@
       -webkit-overflow-scrolling: touch;
       word-break: break-word;
     }
+
+    .picker-item {
+      width: 100%;
+      text-align: left;
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 26px;
+      padding: 16px 18px;
+      font-weight: 900;
+      font-size: 1.2rem;
+    }
+    .picker-item:active { transform: translateY(1px); }
   </style>
 </head>
 
@@ -155,12 +166,21 @@
           { time: "15:25", name: "ICN 抵達(首爾仁川國際機場第2航廈)", icon: "🇰🇷",
             intro: "仁川國際機場不僅是轉機樞紐，本身就是熱門景點。航廈內擁有數位體驗與藝術展示，有多處綠植造景的室內花園，傳統文化體驗中心，提供免費的傳統手工藝DIY和文化表演，以及第2航廈的觀景台可近距離觀看飛機起降"
           },
-          { time: "16:10", name: "從仁川到寄放行李", icon: "🧳",
-            transport: "1.「T-Locker」無人智能儲物櫃位於1樓3號出口、3樓4號出口附近\n2.「T-Luggage」人工櫃檯位於 3 樓出境大廳 H 櫃檯對面，亦有 Zimzero 等合作業者提供服務(3樓4號出口附近)"
+
+          /* ✅ 改名 + 確保第2點換行（下面 modal 也改成會保留換行） */
+          { time: "16:10", name: "仁川機場寄放行李", icon: "🧳",
+            transport:
+              "1.「T-Locker」無人智能儲物櫃位於1樓3號出口、3樓4號出口附近\n" +
+              "2.「T-Luggage」人工櫃檯位於 3 樓出境大廳 H 櫃檯對面，亦有 Zimzero 等合作業者提供服務(3樓4號出口附近)"
           },
+
+          /* ✅ 仁川→弘大教學 + highlight */
           { time: "16:55", name: "從仁川到弘大", icon: "🚇",
-            transport: "建議搭乘 AREX（機場快線）前往「Hongik University Station」，通常最快、最省心。若要更快可選直達列車到首爾站後再轉乘地鐵，但帶行李轉乘會較麻煩。"
+            transport:
+              "從仁川機場第2航廈前往弘大，最快方式是搭乘機場快線AREX普通車，搭乘位置在地下一樓轉乘中心「機場鐵道」處 ，可以現場購買單程票，或是在進站閘口旁邊，有販售T-money交通卡的機器，用T-money交通卡刷卡進站",
+            highlight: "認準「一般列車」（All-stop Train），不能搭乘「直通車」（Express Train）"
           },
+
           { time: "17:55", name: "Hongik University Station", icon: "🎨",
             intro: "弘大位於首爾的麻浦區，是年輕人和潮流愛好者的天堂，因周圍的弘益大學而得名。白天的弘大充滿藝術氣息，街頭藝人的表演、壁畫小巷的創意塗鴉隨處可見；夜晚則變身活力四射的派對聖地，無論是想感受韓國潮流文化，還是尋找獨特的旅行體驗，弘大都是遊客不容錯過的目的地"
           },
@@ -177,16 +197,21 @@
           { time: "19:45", name: "弘大畢卡索街", icon: "🖼️", nav: "https://naver.me/5DZUKipz",
             intro: "位於首爾弘益大學校園旁，是一條以特色塗鴉、創意彩繪牆及藝術氛圍聞名的巷弄。這裡由弘大學生和當地居民共同創作，處處充滿童趣與年輕氣息，也是韓劇《沒關係，是愛情啊》、《瑪莉外宿中》等熱門劇集的經典取景地"
           },
-          { time: "20:20", name: "午餐吃豬肉湯飯-屋同食Okdongsik", icon: "🍲", nav: "https://naver.me/FqHt4PxE",
+
+          /* ✅ 豬肉湯飯改晚餐 */
+          { time: "20:20", name: "晚餐吃豬肉湯飯-屋同食Okdongsik", icon: "🍲", nav: "https://naver.me/FqHt4PxE",
             intro: "由黑湯匙大廚玉東植經營的知名豬肉湯飯餐廳，以「去紐約的豬肉湯」之名在《黑白大廚2》中展現驚人實力。該店連續多年獲米其林必比登推薦，其特色為使用豬肉長時間熬煮的清澈湯頭，風格清淡、不油膩"
           },
           { time: "21:10", name: "哈莫妮超市Harmony Mart弘大店", icon: "🛒", nav: "https://naver.me/GWr2dZLq",
             intro: "採買辛拉麵跟起司泡麵"
           },
+
+          /* ✅ 弘大→仁川教學 + highlight */
           { time: "21:35", name: "從弘大回仁川機場", icon: "🚇", nav: "https://naver.me/5vYH2mKl",
-            intro: "有教學列出怎麼坐車回去仁川機場",
-            transport: "建議搭乘 AREX（機場快線）從 Hongik University Station 返回仁川機場。若時間緊迫，請預留進出站與航廈步行時間。"
+            transport: "從弘大前往仁川機場第2航廈，最快方式是於弘大入口站搭乘機場快線AREX普通車",
+            highlight: "認準「一般列車」（All-stop Train），不能搭乘「直通車」（Express Train）"
           },
+
           { time: "22:35", name: "拿寄放的行李", icon: "🎒" },
           { time: "23:00", name: "AY042 芬蘭航空 首爾 ✈️ 赫爾辛基", icon: "✈️", type: "flight",
             detail: "23:00搭乘芬蘭航空出發(首爾仁川國際機場第1航廈)→HEL 05:40抵達芬蘭赫爾辛基萬塔機場",
@@ -195,6 +220,8 @@
           }
         ]
       },
+
+      /* ===== 以下行程你原本就貼完整，我不動內容，只保留 ===== */
       {
         date: "3/11",
         title: "赫爾辛基 🇫🇮",
@@ -262,6 +289,12 @@
           }
         ]
       },
+
+      /* 你原檔後面 3/12~3/20 全部保留（我不改內容），為了訊息長度這裡不重覆貼。
+         ✅ 但你貼的檔案我已經完整保留：你要的是「一次貼上能跑」，
+         所以我在下方 App 會直接用你原本的 ITINERARY（整份在你檔案裡）。 */
+      /* --- 下面把你貼的 3/12~3/20 也完整放回來 --- */
+      /*（我這裡直接原封不動帶回你貼的內容）*/
       {
         date: "3/12",
         title: "極光之旅 🌌",
@@ -559,6 +592,8 @@
       const [view, setView] = useState('cover');
       const [day, setDay] = useState(0);
       const [records, setRecords] = useState([]);
+
+      // ✅ modal: {type:'item', item} | {type:'picker', title, options, onPick}
       const [modal, setModal] = useState(null);
 
       const [rate, setRate] = useState(35.5);
@@ -580,6 +615,10 @@
 
       const [headerH, setHeaderH] = useState(150);
       const [bottomH, setBottomH] = useState(140);
+
+      // ✅ 手勢判斷（top/bottom zone）
+      const touchRef = useRef({ startY: 0, startX: 0, zone: 'middle' });
+      const SWIPE_THRESHOLD = 18;
 
       const currDay = ITINERARY[day];
 
@@ -668,7 +707,10 @@
         return () => ro.disconnect();
       }, [view, day, records.length]);
 
-      // ✅ 新版：padding 永遠固定（避免跳動），手指碰到中間行程就隱藏；滑回頂部才顯示
+      // ✅ padding 固定，避免跳動
+      const headerPad = headerH;
+      const bottomPad = bottomH;
+
       const TOP_ZONE = 44;
 
       const onMainPointerDown = () => {
@@ -697,12 +739,60 @@
         return () => el.removeEventListener('scroll', onScroll);
       }, [view, day]);
 
+      // ✅ 你要的手勢邏輯
+      const onTouchStart = (e) => {
+        const t = e.touches && e.touches[0];
+        if (!t) return;
+
+        const y = t.clientY;
+        const x = t.clientX;
+        const vh = window.innerHeight || 800;
+
+        let zone = 'middle';
+        if (y <= headerPad) zone = 'top';
+        else if (y >= (vh - bottomPad)) zone = 'bottom';
+
+        touchRef.current = { startY: y, startX: x, zone };
+      };
+
+      const onTouchMove = (e) => {
+        const t = e.touches && e.touches[0];
+        if (!t) return;
+
+        const { startY, startX, zone } = touchRef.current;
+        const dy = t.clientY - startY;
+        const dx = t.clientX - startX;
+
+        if (Math.abs(dx) > Math.abs(dy)) return;
+
+        // 上方標題區往下滑 → 顯示 header/weather
+        if (zone === 'top' && dy > SWIPE_THRESHOLD) setHideUI(false);
+
+        // 下方標題區往上滑 → 顯示 bottom nav
+        if (zone === 'bottom' && dy < -SWIPE_THRESHOLD) setHideUI(false);
+      };
+
       useEffect(() => {
         const t = setTimeout(() => {
           try { lucide.createIcons(); } catch(e) {}
         }, 60);
         return () => clearTimeout(t);
-      }, [view, day, records.length, noticeTab, taxTab]);
+      }, [view, day, records.length, noticeTab, taxTab, modal]);
+
+      // ✅ 換天：跳到最上面 + 不保留上一頁 scroll
+      const goDay = (next) => {
+        const max = ITINERARY.length - 1;
+        const newDay = Math.max(0, Math.min(max, next));
+        setDay(newDay);
+        setHideUI(false);
+        requestAnimationFrame(() => {
+          if (mainRef.current) mainRef.current.scrollTo({ top: 0, behavior: 'auto' });
+        });
+      };
+
+      const openPicker = ({ title, options, onPick }) => {
+        setModal({ type: 'picker', title, options, onPick });
+      };
 
       if (view === 'cover') return (
         <div className="h-full w-full relative flex items-center justify-center text-white overflow-hidden">
@@ -717,7 +807,6 @@
               className="bg-sky-400 text-white px-12 py-4 rounded-full text-2xl font-black btn-cute shadow-2xl"
             >
               <span className="inline-flex items-center gap-3">
-                {/* ✅ 腳印本體藍色 */}
                 <span className="text-blue-600">
                   <i data-lucide="paw-print" size="30"></i>
                 </span>
@@ -727,10 +816,6 @@
           </div>
         </div>
       );
-
-      // ✅ padding 固定（不再跟 hideUI 綁定，避免跳天/抖動）
-      const headerPad = headerH;
-      const bottomPad = bottomH;
 
       return (
         <div className="w-full h-full flex flex-col bg-slate-50 relative overflow-hidden">
@@ -769,7 +854,8 @@
           <div
             ref={mainRef}
             onPointerDown={onMainPointerDown}
-            onTouchStart={onMainPointerDown}
+            onTouchStart={(e)=>{ onTouchStart(e); onMainPointerDown(); }}
+            onTouchMove={onTouchMove}
             className="flex-1 overflow-y-auto p-4 overflow-x-hidden"
             style={{
               paddingTop: `${headerPad}px`,
@@ -788,11 +874,12 @@
                     )}
 
                     <div className="flex items-start gap-4">
-                      <div className="shrink-0 text-4xl leading-none" aria-hidden="true">{it.icon}</div>
+                      {/* ✅ 景點卡片 icon 變小一點 */}
+                      <div className="shrink-0 text-3xl leading-none mt-1" aria-hidden="true">{it.icon}</div>
 
                       <div className="flex-1 min-w-0">
                         <div
-                          onClick={() => setModal(it)}
+                          onClick={() => setModal({ type: 'item', item: it })}
                           className="text-3xl font-black text-slate-700 cursor-pointer leading-snug break-words"
                         >
                           {it.name}
@@ -824,16 +911,16 @@
                   </div>
                 ))}
 
-                {/* ✅ 強制同一行 */}
+                {/* ✅ 強制同一行 + 換天跳到最上面 */}
                 <div className="flex flex-nowrap justify-between items-center mt-10 mb-6 px-2 gap-3">
                   {day > 0
-                    ? <button onClick={() => setDay(day-1)} className="bg-white px-6 py-4 rounded-3xl border btn-cute font-black text-lg italic whitespace-nowrap leading-none">← 上一天</button>
+                    ? <button onClick={() => goDay(day-1)} className="bg-white px-6 py-4 rounded-3xl border btn-cute font-black text-lg italic whitespace-nowrap leading-none">← 上一天</button>
                     : <div/>
                   }
 
                   {day < ITINERARY.length-1
-                    ? <button onClick={() => setDay(day+1)} className="bg-blue-600 text-white px-6 py-4 rounded-3xl btn-cute font-black text-lg italic whitespace-nowrap leading-none">下一天 →</button>
-                    : <button onClick={() => setDay(0)} className="bg-green-500 text-white px-6 py-4 rounded-3xl btn-cute font-black text-lg italic whitespace-nowrap leading-none">🔄 重啟</button>
+                    ? <button onClick={() => goDay(day+1)} className="bg-blue-600 text-white px-6 py-4 rounded-3xl btn-cute font-black text-lg italic whitespace-nowrap leading-none">下一天 →</button>
+                    : <button onClick={() => goDay(0)} className="bg-green-500 text-white px-6 py-4 rounded-3xl btn-cute font-black text-lg italic whitespace-nowrap leading-none">🔄 重啟</button>
                   }
                 </div>
               </div>
@@ -859,25 +946,41 @@
                       value={amt}
                       onChange={e=>setAmt(e.target.value)}
                     />
-                    <select
-                      className="w-1/2 min-w-0 bg-slate-100 rounded-3xl px-4 font-black text-blue-600 text-3xl outline-none"
-                      value={curr}
-                      onChange={e=>setCurr(e.target.value)}
+
+                    {/* ✅ 幣別：顯示「幣別」，按下去才選 */}
+                    <button
+                      onClick={() => openPicker({
+                        title: "幣別",
+                        options: [
+                          { label: "€ EUR", value: "EUR" },
+                          { label: "NT$ TWD", value: "TWD" }
+                        ],
+                        onPick: (v) => setCurr(v)
+                      })}
+                      className="w-1/2 min-w-0 bg-slate-100 rounded-3xl px-4 font-black text-blue-600 text-2xl outline-none btn-cute italic flex items-center justify-center"
+                      type="button"
                     >
-                      <option value="EUR">€ EUR</option>
-                      <option value="TWD">NT$ TWD</option>
-                    </select>
+                      幣別
+                    </button>
                   </div>
 
-                  <select
-                    className="w-full p-5 mb-8 bg-slate-50 rounded-3xl font-black text-2xl outline-none border border-slate-100 min-w-0"
-                    value={pay}
-                    onChange={e=>setPay(e.target.value)}
+                  {/* ✅ 支付方式：顯示「支付方式」，按下去才選 */}
+                  <button
+                    onClick={() => openPicker({
+                      title: "支付方式",
+                      options: [
+                        { label: "💶現金", value: "💶現金" },
+                        { label: "💳星展ECO永續卡", value: "💳星展ECO永續卡" },
+                        { label: "💳台新Richart卡", value: "💳台新Richart卡" }
+                      ],
+                      onPick: (v) => setPay(v)
+                    })}
+                    className="w-full p-5 mb-8 bg-slate-50 rounded-3xl font-black text-2xl outline-none border border-slate-100 btn-cute italic flex items-center justify-between gap-3"
+                    type="button"
                   >
-                    <option value="💶現金">💶現金</option>
-                    <option value="💳星展ECO永續卡">💳星展ECO永續卡</option>
-                    <option value="💳台新Richart卡">💳台新Richart卡</option>
-                  </select>
+                    <span>支付方式</span>
+                    <span className="text-slate-500 break-words">{pay}</span>
+                  </button>
 
                   <button onClick={addRec} className="w-full bg-blue-600 text-white py-6 rounded-3xl font-black text-4xl btn-cute shadow-lg">
                     存入帳本
@@ -907,6 +1010,7 @@
                         className="shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center bg-red-50 text-red-400 text-2xl active:scale-95 active:bg-red-100"
                         aria-label="刪除"
                         title="刪除"
+                        type="button"
                       >
                         🗑️
                       </button>
@@ -926,18 +1030,21 @@
               </div>
             )}
 
+            {/* notice / tax 內容你原本就完整，保持不變 */}
             {view === 'notice' && (
               <div className="space-y-6 overflow-x-hidden">
                 <div className="bg-white p-4 rounded-[40px] border-2 border-slate-100 flex gap-3">
                   <button
                     onClick={()=>setNoticeTab('seoul')}
                     className={`flex-1 py-3 rounded-3xl font-black text-2xl btn-cute italic ${noticeTab==='seoul' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'}`}
+                    type="button"
                   >
                     🇰🇷 首爾
                   </button>
                   <button
                     onClick={()=>setNoticeTab('finland')}
                     className={`flex-1 py-3 rounded-3xl font-black text-2xl btn-cute italic ${noticeTab==='finland' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'}`}
+                    type="button"
                   >
                     🇫🇮 芬蘭
                   </button>
@@ -964,6 +1071,7 @@
                         <button
                           onClick={() => window.open("https://naver.me/xUt8tQ2a")}
                           className="bg-blue-500 text-white px-6 py-3 rounded-2xl text-2xl font-black btn-cute italic whitespace-nowrap flex items-center justify-center gap-2"
+                          type="button"
                         >
                           <span aria-hidden="true">📍</span><span>導航</span>
                         </button>
@@ -1006,12 +1114,14 @@
                   <button
                     onClick={()=>setTaxTab('seoul')}
                     className={`flex-1 py-3 rounded-3xl font-black text-2xl btn-cute italic ${taxTab==='seoul' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'}`}
+                    type="button"
                   >
                     🇰🇷 首爾
                   </button>
                   <button
                     onClick={()=>setTaxTab('finland')}
                     className={`flex-1 py-3 rounded-3xl font-black text-2xl btn-cute italic ${taxTab==='finland' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'}`}
+                    type="button"
                   >
                     🇫🇮 芬蘭
                   </button>
@@ -1095,10 +1205,12 @@
           >
             {view === 'itinerary' && (
               <div className="px-4 pt-3 pb-2">
+                {/* ✅ 極光點擊改成 northernlights.online（會走系統 deep link/可直接喚起 app 的就會開） */}
                 <button
-                  onClick={() => window.open(`https://www.swpc.noaa.gov/products/aurora-30-minute-forecast`)}
+                  onClick={() => window.open(`https://northernlights.online`, '_blank')}
                   className="w-full bg-blue-800 text-white py-3 text-sm font-black italic tracking-widest flex items-center justify-center gap-2 rounded-2xl shadow-xl border border-blue-700/30"
-                  title="點擊查看 NOAA 極光預測"
+                  title="點擊開啟 Northern Lights"
+                  type="button"
                 >
                   🌌 今日 {lastCityName} 極光 KP 值:
                   <span className="text-green-300 text-sm">{kpValue}</span>
@@ -1107,57 +1219,96 @@
             )}
 
             <div className="h-28 glass border-t flex justify-around items-center px-4 safe-bottom">
-              <button onClick={()=>setView('itinerary')} className={`flex flex-col items-center gap-1 ${view==='itinerary'?'text-blue-600 scale-125 font-black italic':'text-slate-300'}`}>
+              <button onClick={()=>setView('itinerary')} className={`flex flex-col items-center gap-1 ${view==='itinerary'?'text-blue-600 scale-125 font-black italic':'text-slate-300'}`} type="button">
                 <i data-lucide="calendar" size={32}></i><span className="text-base font-black">行程</span>
               </button>
-              <button onClick={()=>setView('budget')} className={`flex flex-col items-center gap-1 ${view==='budget'?'text-blue-600 scale-125 font-black italic':'text-slate-300'}`}>
+              <button onClick={()=>setView('budget')} className={`flex flex-col items-center gap-1 ${view==='budget'?'text-blue-600 scale-125 font-black italic':'text-slate-300'}`} type="button">
                 <i data-lucide="piggy-bank" size={32}></i><span className="text-base font-black">記帳</span>
               </button>
-              <button onClick={()=>setView('notice')} className={`flex flex-col items-center gap-1 ${view==='notice'?'text-blue-600 scale-125 font-black italic':'text-slate-300'}`}>
+              <button onClick={()=>setView('notice')} className={`flex flex-col items-center gap-1 ${view==='notice'?'text-blue-600 scale-125 font-black italic':'text-slate-300'}`} type="button">
                 <i data-lucide="info" size={32}></i><span className="text-base font-black">注意</span>
               </button>
-              <button onClick={()=>setView('tax')} className={`flex flex-col items-center gap-1 ${view==='tax'?'text-blue-600 scale-125 font-black italic':'text-slate-300'}`}>
+              <button onClick={()=>setView('tax')} className={`flex flex-col items-center gap-1 ${view==='tax'?'text-blue-600 scale-125 font-black italic':'text-slate-300'}`} type="button">
                 <i data-lucide="receipt" size={32}></i><span className="text-base font-black">退稅</span>
               </button>
             </div>
           </div>
 
+          {/* ✅ Modal（景點/教學/選單） */}
           {modal && (
             <div className="modal-wrap" onClick={()=>setModal(null)}>
               <div className="modal-card" onClick={e=>e.stopPropagation()}>
-                <h3 className="text-4xl font-black mb-6 text-blue-900 italic underline decoration-yellow-200 underline-offset-8 leading-snug break-words">
-                  {modal.name}
-                </h3>
+                {modal.type === 'item' && (
+                  <>
+                    {/* ✅ 景點介紹標題再小一點 */}
+                    <h3 className="text-3xl font-black mb-6 text-blue-900 italic underline decoration-yellow-200 underline-offset-8 leading-snug break-words">
+                      {modal.item.name}
+                    </h3>
 
-                <div className="modal-body intro-scroll text-slate-600">
-                  {modal.highlight && (
-                    <div className="p-6 bg-red-50 rounded-[40px] border-4 border-red-100 text-red-600 text-2xl font-black italic leading-relaxed break-words mb-6">
-                      ⚠️ {modal.highlight}
-                    </div>
-                  )}
+                    <div className="modal-body intro-scroll text-slate-600">
+                      {/* ✅ highlight 不用三角形 */}
+                      {modal.item.highlight && (
+                        <div className="p-6 bg-yellow-50 rounded-[40px] border-4 border-yellow-100 text-slate-800 text-2xl font-black italic leading-relaxed break-words mb-6 whitespace-pre-wrap">
+                          {modal.item.highlight}
+                        </div>
+                      )}
 
-                  {modal.transport && (
-                    <div className="p-6 bg-sky-50 rounded-[40px] border-4 border-sky-100 text-sky-800 text-2xl font-black italic leading-relaxed break-words mb-6">
-                      💡 教學：<br/>{modal.transport}
+                      {/* ✅ transport/detail 保留換行（修正你說第2點沒有換行的問題） */}
+                      {modal.item.transport && (
+                        <div className="p-6 bg-sky-50 rounded-[40px] border-4 border-sky-100 text-sky-800 text-2xl font-black italic leading-relaxed break-words mb-6 whitespace-pre-wrap">
+                          💡 教學：{modal.item.transport}
+                        </div>
+                      )}
+                      {modal.item.detail && (
+                        <div className="text-xl font-black text-slate-400 border-b-4 pb-4 italic uppercase tracking-widest leading-loose break-words mb-6 whitespace-pre-wrap">
+                          詳情：{modal.item.detail}
+                        </div>
+                      )}
+                      {modal.item.intro && (
+                        <p className="font-black italic whitespace-pre-wrap leading-loose break-words">{modal.item.intro}</p>
+                      )}
                     </div>
-                  )}
-                  {modal.detail && (
-                    <div className="text-xl font-black text-slate-400 border-b-4 pb-4 italic uppercase tracking-widest leading-loose break-words mb-6">
-                      詳情：<br/>{modal.detail}
-                    </div>
-                  )}
-                  {modal.intro && (
-                    <p className="font-black italic whitespace-pre-wrap leading-loose break-words">{modal.intro}</p>
-                  )}
-                </div>
 
-                {/* CLOSE 已是較小版本（不遮擋內文） */}
-                <button
-                  onClick={() => setModal(null)}
-                  className="mt-4 w-full py-2 bg-slate-100 rounded-[26px] font-black text-slate-500 uppercase btn-cute text-lg italic"
-                >
-                  CLOSE
-                </button>
+                    <button
+                      onClick={() => setModal(null)}
+                      className="mt-4 w-full py-2 bg-slate-100 rounded-[26px] font-black text-slate-500 uppercase btn-cute text-lg italic"
+                      type="button"
+                    >
+                      CLOSE
+                    </button>
+                  </>
+                )}
+
+                {modal.type === 'picker' && (
+                  <>
+                    <h3 className="text-3xl font-black mb-6 text-blue-900 italic underline decoration-yellow-200 underline-offset-8 leading-snug break-words">
+                      {modal.title}
+                    </h3>
+
+                    <div className="modal-body">
+                      <div className="space-y-3">
+                        {modal.options.map((op, idx) => (
+                          <button
+                            key={idx}
+                            className="picker-item btn-cute italic"
+                            onClick={() => { modal.onPick(op.value); setModal(null); }}
+                            type="button"
+                          >
+                            {op.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => setModal(null)}
+                      className="mt-4 w-full py-2 bg-slate-100 rounded-[26px] font-black text-slate-500 uppercase btn-cute text-lg italic"
+                      type="button"
+                    >
+                      CLOSE
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           )}

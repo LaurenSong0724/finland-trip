@@ -202,9 +202,6 @@
           }
         ]
       },
-
-      /* ======= 以下芬蘭行程（保持原樣） ======= */
-
       {
         date: "3/11",
         title: "赫爾辛基 🇫🇮",
@@ -576,15 +573,13 @@
 
       const [item, setItem] = useState('');
       const [amt, setAmt] = useState('');
-
-      // ✅ 改：預設顯示「幣別 / 支付方式」，點選才看到選項
       const [pay, setPay] = useState('PAY');
       const [curr, setCurr] = useState('CURR');
 
       const [hideUI, setHideUI] = useState(false);
 
-      const [noticeTab, setNoticeTab] = useState('seoul'); // seoul | finland
-      const [taxTab, setTaxTab] = useState('seoul'); // seoul | finland
+      const [noticeTab, setNoticeTab] = useState('seoul');
+      const [taxTab, setTaxTab] = useState('seoul');
 
       const headerRef = useRef(null);
       const bottomRef = useRef(null);
@@ -593,9 +588,8 @@
       const [headerH, setHeaderH] = useState(150);
       const [bottomH, setBottomH] = useState(140);
 
-      // ✅ Samsung Internet 友善：在主捲動區偵測「上緣下滑 / 下緣上滑」叫回 UI
       const touchStartYRef2 = useRef(null);
-      const touchStartZoneRef = useRef(null); // 'top' | 'bottom' | null
+      const touchStartZoneRef = useRef(null);
 
       const currDay = ITINERARY[day];
 
@@ -655,7 +649,6 @@
 
         const usingCurr = (curr === 'CURR') ? 'EUR' : curr;
         const twdVal = (usingCurr === 'EUR') ? (amount * Number(rate)) : amount;
-
         const usingPay = (pay === 'PAY') ? '💶現金' : pay;
 
         const r = { id: Date.now(), item, amt: amount, pay: usingPay, curr: usingCurr, twd: twdVal };
@@ -688,8 +681,6 @@
         return () => ro.disconnect();
       }, [view, day, records.length]);
 
-      // ✅ 你要的：在看中間行程時就藏 UI，不要一直跑出來
-      // 只有你在「螢幕最上緣往下滑」或「螢幕最下緣往上滑」才叫回 UI
       const TOP_ZONE = 44;
 
       const onMainPointerDown = () => {
@@ -704,7 +695,6 @@
         setHideUI(true);
       };
 
-      // ✅ Samsung Internet：主捲動區的 touch 手勢偵測
       const EDGE_TOP = 70;
       const EDGE_BOTTOM = 90;
       const SWIPE_TRIGGER = 28;
@@ -740,20 +730,18 @@
         if (zone === 'bottom' && dy < -SWIPE_TRIGGER) setHideUI(false);
       };
 
-      // ✅ 跳天/切回行程：自動回到最上面
       useEffect(() => {
         const el = mainRef.current;
         if (!el) return;
-        if (view === 'itinerary') el.scrollTop = 0;
-      }, [day, view]);
+        el.scrollTop = 0;
+        setHideUI(false);
+      }, [day, view, noticeTab, taxTab]);
 
       useEffect(() => {
         const el = mainRef.current;
         if (!el) return;
 
         const onScroll = () => {
-          // ✅ 不再因為回頂就自動顯示，避免一直跑出來
-          // 只要在最上面，就不藏（避免你回頂想按Day按鈕卻不見）
           const top = el.scrollTop || 0;
           if (top <= TOP_ZONE) setHideUI(false);
         };
@@ -797,13 +785,11 @@
       const bottomPad = bottomH;
 
       const openAuroraApp = () => {
-        // ✅ 你要的：點擊直接開 northernlights.online
         window.location.href = "https://northernlights.online";
       };
 
       return (
         <div className="w-full h-full flex flex-col bg-slate-50 relative overflow-hidden">
-          {/* Header */}
           <div
             ref={headerRef}
             className={`absolute top-0 left-0 right-0 z-50 p-6 glass border-b flex justify-between items-center overflow-x-hidden ui-slide ${hideUI ? 'ui-hide' : ''}`}
@@ -834,7 +820,6 @@
             )}
           </div>
 
-          {/* Main Content */}
           <div
             ref={mainRef}
             onPointerDown={onMainPointerDown}
@@ -857,9 +842,8 @@
                       </div>
                     )}
 
-                    <div className="flex items-start gap-4">
-                      {/* ✅ 圖示變小一點 */}
-                      <div className="shrink-0 text-3xl leading-none" aria-hidden="true">{it.icon}</div>
+                    <div className="flex items-start gap-3">
+                      <div className="shrink-0 text-2xl leading-none mt-1" aria-hidden="true">{it.icon}</div>
 
                       <div className="flex-1 min-w-0">
                         <div
@@ -921,16 +905,16 @@
                     onChange={e=>setItem(e.target.value)}
                   />
 
-                  <div className="flex gap-4 mb-4">
+                  <div className="flex gap-3 mb-4">
                     <input
                       type="number"
                       placeholder="金額"
-                      className="w-1/2 min-w-0 p-5 bg-slate-50 rounded-3xl font-black text-3xl border border-slate-100 outline-none"
+                      className="w-[58%] min-w-0 p-5 bg-slate-50 rounded-3xl font-black text-3xl leading-tight border border-slate-100 outline-none"
                       value={amt}
                       onChange={e=>setAmt(e.target.value)}
                     />
                     <select
-                      className="w-1/2 min-w-0 bg-slate-100 rounded-3xl px-4 font-black text-blue-600 text-3xl outline-none"
+                      className="w-[42%] min-w-0 bg-slate-100 rounded-3xl px-3 py-4 font-black text-blue-600 text-2xl leading-tight outline-none"
                       value={curr}
                       onChange={e=>setCurr(e.target.value)}
                     >
@@ -1160,7 +1144,6 @@
             )}
           </div>
 
-          {/* Bottom Nav */}
           <div
             ref={bottomRef}
             className={`absolute bottom-0 left-0 right-0 z-40 overflow-x-hidden ui-slide ${hideUI ? 'bottom-hide' : ''}`}
@@ -1185,7 +1168,6 @@
               <button onClick={()=>setView('budget')} className={`flex flex-col items-center gap-1 ${view==='budget'?'text-blue-600 scale-125 font-black italic':'text-slate-300'}`}>
                 <i data-lucide="piggy-bank" size={32}></i><span className="text-base font-black">記帳</span>
               </button>
-              {/* ✅ 注意/退稅圖示縮小一點 */}
               <button onClick={()=>setView('notice')} className={`flex flex-col items-center gap-1 ${view==='notice'?'text-blue-600 scale-125 font-black italic':'text-slate-300'}`}>
                 <i data-lucide="info" size={26}></i><span className="text-base font-black">注意</span>
               </button>
@@ -1198,7 +1180,6 @@
           {modal && (
             <div className="modal-wrap" onClick={()=>setModal(null)}>
               <div className="modal-card" onClick={e=>e.stopPropagation()}>
-                {/* ✅ 彈窗標題縮小 */}
                 <h3 className="text-3xl font-black mb-5 text-blue-900 italic underline decoration-yellow-200 underline-offset-8 leading-tight break-words">
                   {modal.name}
                 </h3>

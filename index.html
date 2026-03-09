@@ -87,6 +87,14 @@
       overflow-x: hidden;
       word-break: break-word;
     }
+    .packing-card {
+      background: white;
+      border-radius: 40px;
+      padding: 1.3rem 1.4rem;
+      border: 2px solid #eef2ff;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.04);
+    }
     .intro-scroll::-webkit-scrollbar { width: 4px; }
     .intro-scroll::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
 
@@ -126,6 +134,27 @@
       padding-bottom: 14px;
       -webkit-overflow-scrolling: touch;
       word-break: break-word;
+    }
+
+    .check-btn{
+      width: 34px;
+      height: 34px;
+      min-width: 34px;
+      border-radius: 10px;
+      border: 2px solid #cbd5e1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 1.05rem;
+      font-weight: 900;
+      transition: all .15s ease;
+      background: #fff;
+      color: #fff;
+    }
+    .check-btn.checked{
+      background: #3b82f6;
+      border-color: #3b82f6;
+      color: #fff;
     }
   </style>
 </head>
@@ -556,6 +585,68 @@
       }
     ];
 
+    const PACKING_DATA = {
+      carry: [
+        {
+          title: "重要物品",
+          icon: "🪪",
+          items: ["護照", "老公駕照", "老公國際駕照", "歐元", "信用卡"]
+        },
+        {
+          title: "其他",
+          icon: "🎒",
+          items: ["電動牙刷", "Medicube Booster Pro", "行動電源", "充電器", "一個透明夾鏈袋", "蒸氣眼罩", "手機暖暖包"]
+        }
+      ],
+      checked: [
+        {
+          title: "外套",
+          icon: "🧥",
+          items: ["米白長版大衣", "黑白羊羔毛棒球外套"]
+        },
+        {
+          title: "帽子",
+          icon: "🧶",
+          items: ["米白球球毛帽", "各種毛帽", "保暖漁夫帽", "老公毛帽"]
+        },
+        {
+          title: "圍巾",
+          icon: "🧣",
+          items: ["米奇米色", "其他圍巾"]
+        },
+        {
+          title: "上衣",
+          icon: "👚",
+          items: ["灰花色針織開衫", "黑色胸前有一個開口那件", "白色長版", "灰色長版連帽T", "老公衣服"]
+        },
+        {
+          title: "下身",
+          icon: "👖",
+          items: ["灰色版型好的", "牛仔寬褲", "黑色加絨鯊魚褲", "黑色牛仔褲", "老公褲子"]
+        },
+        {
+          title: "搭配",
+          icon: "🧤",
+          items: ["發熱衣", "發熱褲", "白色堆堆襪", "保暖觸控手套", "老公手套"]
+        },
+        {
+          title: "其他",
+          icon: "🧴",
+          items: ["吹風機", "延長線", "保養品", "化妝品", "一次性床單", "一次性毛巾", "面膜"]
+        },
+        {
+          title: "鞋子",
+          icon: "👟",
+          items: ["雪靴", "米灰NB"]
+        },
+        {
+          title: "包包",
+          icon: "👜",
+          items: ["藍色咖波袋子"]
+        }
+      ]
+    };
+
     function uniqCities(list){
       const seen = new Set();
       const out = [];
@@ -564,6 +655,18 @@
         if (!seen.has(key)) { seen.add(key); out.push(c); }
       });
       return out;
+    }
+
+    function makePackingInitialState() {
+      const state = {};
+      Object.values(PACKING_DATA).forEach(groups => {
+        groups.forEach(group => {
+          group.items.forEach(item => {
+            state[item] = false;
+          });
+        });
+      });
+      return state;
     }
 
     function App() {
@@ -584,6 +687,16 @@
 
       const [noticeTab, setNoticeTab] = useState('seoul');
       const [taxTab, setTaxTab] = useState('seoul');
+      const [packingTab, setPackingTab] = useState('carry');
+
+      const [packingChecks, setPackingChecks] = useState(() => {
+        try {
+          const saved = localStorage.getItem('finland-trip-packing-checks');
+          return saved ? { ...makePackingInitialState(), ...JSON.parse(saved) } : makePackingInitialState();
+        } catch (e) {
+          return makePackingInitialState();
+        }
+      });
 
       const headerRef = useRef(null);
       const bottomRef = useRef(null);
@@ -607,6 +720,20 @@
         if (currDay?.weatherCities && currDay.weatherCities.length) return uniqCities(currDay.weatherCities);
         return [];
       }, [day]);
+
+      const currentPackingGroups = packingTab === 'carry' ? PACKING_DATA.carry : PACKING_DATA.checked;
+
+      const packingStats = useMemo(() => {
+        const flat = currentPackingGroups.flatMap(group => group.items);
+        const checkedCount = flat.filter(name => packingChecks[name]).length;
+        return { total: flat.length, checked: checkedCount };
+      }, [packingTab, packingChecks]);
+
+      useEffect(() => {
+        try {
+          localStorage.setItem('finland-trip-packing-checks', JSON.stringify(packingChecks));
+        } catch (e) {}
+      }, [packingChecks]);
 
       useEffect(() => {
         fetch('https://api.exchangerate-api.com/v4/latest/EUR')
@@ -662,6 +789,10 @@
         setAmt('');
       };
 
+      const togglePackingItem = (name) => {
+        setPackingChecks(prev => ({ ...prev, [name]: !prev[name] }));
+      };
+
       useLayoutEffect(() => {
         const headerEl = headerRef.current;
         const bottomEl = bottomRef.current;
@@ -683,7 +814,7 @@
         setBottomH(Math.max(110, Math.round(b0)));
 
         return () => ro.disconnect();
-      }, [view, day, records.length]);
+      }, [view, day, records.length, packingTab, noticeTab, taxTab]);
 
       const TOP_ZONE = 44;
 
@@ -739,7 +870,7 @@
         if (!el) return;
         el.scrollTop = 0;
         setHideUI(false);
-      }, [day, view, noticeTab, taxTab]);
+      }, [day, view, noticeTab, taxTab, packingTab]);
 
       useEffect(() => {
         const el = mainRef.current;
@@ -760,7 +891,7 @@
           try { lucide.createIcons(); } catch(e) {}
         }, 60);
         return () => clearTimeout(t);
-      }, [view, day, records.length, noticeTab, taxTab]);
+      }, [view, day, records.length, noticeTab, taxTab, packingTab, packingChecks]);
 
       if (view === 'cover') return (
         <div className="h-full w-full relative flex items-center justify-center text-white overflow-hidden">
@@ -800,12 +931,15 @@
           >
             <div className="min-w-0">
               <h2 className="text-4xl font-black text-blue-900 italic underline decoration-blue-200">
-                {view === 'itinerary' ? `Day ${day+1}` :
+                {view === 'packing' ? '要帶的物品' :
+                 view === 'itinerary' ? `Day ${day+1}` :
                  view === 'budget' ? '記帳本' :
                  view === 'notice' ? '注意事項' : '退稅攻略'}
               </h2>
               <p className="text-lg text-gray-400 font-black mt-1">
-                {view === 'itinerary' ? `${currDay.date} | ${currDay.title}` : '2026 Finland Trip'}
+                {view === 'itinerary' ? `${currDay.date} | ${currDay.title}` :
+                 view === 'packing' ? `${packingTab === 'carry' ? '隨身行李' : '拖運行李'} | 已完成 ${packingStats.checked}/${packingStats.total}` :
+                 '2026 Finland Trip'}
               </p>
             </div>
 
@@ -822,6 +956,14 @@
                 ))}
               </div>
             )}
+
+            {view === 'packing' && (
+              <div className="shrink-0 text-right">
+                <div className="bg-sky-50 border border-sky-100 rounded-3xl px-4 py-3 text-sky-700 text-lg font-black italic whitespace-nowrap">
+                  ✅ {packingStats.checked}/{packingStats.total}
+                </div>
+              </div>
+            )}
           </div>
 
           <div
@@ -836,6 +978,58 @@
               WebkitOverflowScrolling: 'touch'
             }}
           >
+            {view === 'packing' && (
+              <div className="space-y-6 overflow-x-hidden">
+                <div className="bg-white p-4 rounded-[40px] border-2 border-slate-100 flex gap-3">
+                  <button
+                    onClick={()=>setPackingTab('carry')}
+                    className={`flex-1 py-3 rounded-3xl font-black text-2xl btn-cute italic ${packingTab==='carry' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'}`}
+                  >
+                    🎒 隨身
+                  </button>
+                  <button
+                    onClick={()=>setPackingTab('checked')}
+                    className={`flex-1 py-3 rounded-3xl font-black text-2xl btn-cute italic ${packingTab==='checked' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'}`}
+                  >
+                    🧳 拖運
+                  </button>
+                </div>
+
+                <div className="space-y-5">
+                  {currentPackingGroups.map((group, gi) => (
+                    <div key={gi} className="info-card">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="text-3xl">{group.icon}</div>
+                        <h4 className="text-3xl font-black text-blue-600 underline decoration-blue-100">
+                          {group.title}
+                        </h4>
+                      </div>
+
+                      <div className="space-y-3">
+                        {group.items.map((name, idx) => {
+                          const checked = !!packingChecks[name];
+                          return (
+                            <button
+                              key={idx}
+                              onClick={() => togglePackingItem(name)}
+                              className="packing-card w-full flex items-center gap-4 text-left active:scale-[0.99]"
+                            >
+                              <span className={`check-btn ${checked ? 'checked' : ''}`}>
+                                {checked ? '✓' : ''}
+                              </span>
+                              <span className={`text-2xl font-black italic break-words ${checked ? 'text-slate-400 line-through' : 'text-slate-700'}`}>
+                                {name}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {view === 'itinerary' && (
               <div className="space-y-6">
                 {currDay.items.map((it, i) => (
@@ -1165,18 +1359,21 @@
               </div>
             )}
 
-            <div className="h-28 glass border-t flex justify-around items-center px-4 safe-bottom">
-              <button onClick={()=>setView('itinerary')} className={`flex flex-col items-center gap-1 ${view==='itinerary'?'text-blue-600 scale-125 font-black italic':'text-slate-300'}`}>
-                <i data-lucide="calendar" size={32}></i><span className="text-base font-black">行程</span>
+            <div className="h-28 glass border-t flex justify-around items-center px-3 safe-bottom">
+              <button onClick={()=>setView('packing')} className={`flex flex-col items-center gap-1 ${view==='packing'?'text-blue-600 scale-110 font-black italic':'text-slate-300'}`}>
+                <i data-lucide="package" size={26}></i><span className="text-sm font-black">物品</span>
               </button>
-              <button onClick={()=>setView('budget')} className={`flex flex-col items-center gap-1 ${view==='budget'?'text-blue-600 scale-125 font-black italic':'text-slate-300'}`}>
-                <i data-lucide="piggy-bank" size={32}></i><span className="text-base font-black">記帳</span>
+              <button onClick={()=>setView('itinerary')} className={`flex flex-col items-center gap-1 ${view==='itinerary'?'text-blue-600 scale-110 font-black italic':'text-slate-300'}`}>
+                <i data-lucide="calendar" size={28}></i><span className="text-sm font-black">行程</span>
               </button>
-              <button onClick={()=>setView('notice')} className={`flex flex-col items-center gap-1 ${view==='notice'?'text-blue-600 scale-125 font-black italic':'text-slate-300'}`}>
-                <i data-lucide="info" size={26}></i><span className="text-base font-black">注意</span>
+              <button onClick={()=>setView('budget')} className={`flex flex-col items-center gap-1 ${view==='budget'?'text-blue-600 scale-110 font-black italic':'text-slate-300'}`}>
+                <i data-lucide="piggy-bank" size={28}></i><span className="text-sm font-black">記帳</span>
               </button>
-              <button onClick={()=>setView('tax')} className={`flex flex-col items-center gap-1 ${view==='tax'?'text-blue-600 scale-125 font-black italic':'text-slate-300'}`}>
-                <i data-lucide="receipt" size={26}></i><span className="text-base font-black">退稅</span>
+              <button onClick={()=>setView('notice')} className={`flex flex-col items-center gap-1 ${view==='notice'?'text-blue-600 scale-110 font-black italic':'text-slate-300'}`}>
+                <i data-lucide="info" size={24}></i><span className="text-sm font-black">注意</span>
+              </button>
+              <button onClick={()=>setView('tax')} className={`flex flex-col items-center gap-1 ${view==='tax'?'text-blue-600 scale-110 font-black italic':'text-slate-300'}`}>
+                <i data-lucide="receipt" size={24}></i><span className="text-sm font-black">退稅</span>
               </button>
             </div>
           </div>

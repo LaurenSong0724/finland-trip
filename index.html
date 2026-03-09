@@ -213,7 +213,7 @@
             intro: "韓國最大時尚電商平台「MUSINSA」推出的自有品牌，主打極簡、高CP值的基本款日常服飾，常被稱為「韓國版Uniqlo」。該品牌專注於百搭的基礎設計，結合流行元素，價格親民且品質穩定，深受韓國MZ世代喜愛，實體門市如弘大、明洞店均設有現場退稅服務"
           },
           { time: "20:35", name: "Olive Young Hongdae Town", icon: "🧴", nav: "https://naver.me/xDjQlhha",
-            highlight: "因為托運行李直掛的關係，不要買液體類的",
+            highlight: "因為行李直掛的關係，不要買太多液體類",
             intro: "2024年開幕的旗艦級分店，位於弘大入口站 8 號出口附近，是繼明洞後規模龐大的指標性分店。該店共三層樓，不僅彩妝、保養品種類極齊全、空間寬敞，是韓國年輕人與旅客的熱門美妝地標"
           },
           { time: "21:05", name: "哈莫妮超市Harmony Mart弘大店", icon: "🛒", nav: "https://naver.me/GWr2dZLq",
@@ -1044,6 +1044,14 @@
 
             {view === 'itinerary' && (
               <div className="space-y-6">
+                {day === 0 && (
+                  <div className="bg-yellow-50 border-2 border-yellow-200 rounded-[32px] px-6 py-5 shadow-sm">
+                    <div className="text-red-600 text-2xl font-black italic leading-relaxed break-words">
+                      因為行李直掛的關係，不要買太多液體類
+                    </div>
+                  </div>
+                )}
+
                 {currDay.items.map((it, i) => (
                   <div key={i} className="item-card overflow-x-hidden">
                     {it.time && (

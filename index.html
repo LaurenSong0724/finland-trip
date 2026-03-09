@@ -9,6 +9,7 @@
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <style>
     @font-face {
@@ -205,8 +206,8 @@
           { time: "19:00", name: "晚餐吃豬肉湯飯-屋同食Okdongsik", icon: "🍲", nav: "https://naver.me/FqHt4PxE",
             intro: "由黑湯匙大廚玉東植經營的知名豬肉湯飯餐廳，以「去紐約的豬肉湯」之名在《黑白大廚2》中展現驚人實力。該店連續多年獲米其林必比登推薦，其特色為使用豬肉長時間熬煮的清澈湯頭，風格清淡、不油膩"
           },
-          { time: "19:45", name: "大創", icon: "🪴", nav: "https://naver.me/FVbYVCYc",
-            intro: "去看看有沒有老公想買的澆花壺"
+          { time: "19:45", name: "大創", icon: "🧴", nav: "https://naver.me/FVbYVCYc",
+            intro: "買藥妝，還有看看有沒有老公想買的澆花壺"
           },
           { time: "20:05", name: "Musinsa Standard Hongdae", icon: "👕", nav: "https://naver.me/Gyyb0QjZ",
             intro: "韓國最大時尚電商平台「MUSINSA」推出的自有品牌，主打極簡、高CP值的基本款日常服飾，常被稱為「韓國版Uniqlo」。該品牌專注於百搭的基礎設計，結合流行元素，價格親民且品質穩定，深受韓國MZ世代喜愛，實體門市如弘大、明洞店均設有現場退稅服務"
@@ -222,12 +223,19 @@
             intro: "買涼感眼藥水"
           },
 
-          { time: "21:45", name: "從弘大回仁川機場", icon: "🚇", nav: "https://naver.me/5vYH2mKl",
+          { time: "21:35", name: "從弘大回仁川機場", icon: "🚇", nav: "https://naver.me/5vYH2mKl",
             highlight: "認準「一般列車」（All-stop Train），不能搭乘「直通車」（Express Train）",
-            transport: "從弘大前往仁川機場第2航廈，最快方式是於弘大入口站搭乘機場快線AREX普通車"
+            transport: "從弘大前往仁川機場，建議提早搭乘 AREX 普通車，抓 22:00 左右回到仁川機場比較保險。若寄放在第2航廈、但芬蘭航空於第1航廈出發，拿完行李後還要預留航廈移動時間。"
           },
 
-          { time: "22:35", name: "拿寄放的行李", icon: "🎒" },
+          { time: "22:00", name: "回到仁川機場", icon: "🏢",
+            intro: "22:00 前回到仁川機場，準備拿寄放的行李。"
+          },
+
+          { time: "22:10", name: "拿寄放的行李", icon: "🎒",
+            intro: "先取回寄放行李，再確認是否需要從第2航廈移動至第1航廈辦理後續搭機。"
+          },
+
           { time: "23:00", name: "AY042 芬蘭航空 首爾 ✈️ 赫爾辛基", icon: "✈️", type: "flight",
             detail: "23:00搭乘芬蘭航空出發(首爾仁川國際機場第1航廈)→HEL 05:40抵達芬蘭赫爾辛基萬塔機場",
             intro: "抵達 HEL 後，搭乘火車 P 線或 I 線前往赫爾辛基中央車站，通常最方便。到中央車站後可前往地下一樓寄放行李，再開始市區行程。"
@@ -709,11 +717,10 @@
 
       const currDay = ITINERARY[day];
 
-      const lastCityName = (currDay?.kpArea)
-        ? currDay.kpArea
-        : ((currDay?.weatherCities && currDay.weatherCities.length)
-            ? currDay.weatherCities[currDay.weatherCities.length - 1].n
-            : "目前地點");
+      const lastCityName =
+        (currDay?.weatherCities && currDay.weatherCities.length)
+          ? currDay.weatherCities[currDay.weatherCities.length - 1].n
+          : "目前地點";
 
       const weatherList = useMemo(() => {
         if (currDay?.weatherCities && currDay.weatherCities.length) return uniqCities(currDay.weatherCities);
@@ -749,18 +756,24 @@
 
         const fetchKp = async () => {
           try {
-            const res = await fetch("https://services.swpc.noaa.gov/json/planetary_k_index_1m.json", { cache: "no-store" });
+            const res = await fetch("https://services.swpc.noaa.gov/json/planetary_k_index_1m.json", {
+              cache: "no-store"
+            });
+
             const data = await res.json();
-            const last = data && data.length ? data[data.length - 1] : null;
-            const kp = last?.kp_index;
+            const last = Array.isArray(data) && data.length ? data[data.length - 1] : null;
+            const kp = Number(last?.kp_index);
 
             if (!alive) return;
-            if (kp !== undefined && kp !== null && !Number.isNaN(Number(kp))) {
-              setKpValue(Number(kp).toFixed(1));
+
+            if (Number.isFinite(kp)) {
+              setKpValue(kp.toFixed(1));
             } else {
-              setKpValue('—');
+              setKpValue("—");
             }
-          } catch (e) {}
+          } catch (e) {
+            if (alive) setKpValue("—");
+          }
         };
 
         fetchKp();
@@ -1423,8 +1436,5 @@
     root.render(<App />);
     setTimeout(() => { try { lucide.createIcons(); } catch(e) {} }, 120);
   </script>
-
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </body>
 </html>
-

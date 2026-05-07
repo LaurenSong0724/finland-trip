@@ -184,16 +184,13 @@
           { time: "15:25", name: "ICN 抵達(首爾仁川國際機場第2航廈)", icon: "🇰🇷",
             intro: "仁川國際機場不僅是轉機樞紐，本身就是熱門景點。航廈內擁有數位體驗與藝術展示，有多處綠植造景的室內花園，傳統文化體驗中心，提供免費的傳統手工藝DIY和文化表演，以及第2航廈的觀景台可近距離觀看飛機起降"
           },
-
           { time: "16:10", name: "從仁川機場寄放行李", icon: "🧳",
             transport: "1.「T-Locker」無人智能儲物櫃位於1樓3號出口、3樓4號出口附近\n2.「T-Luggage」人工櫃檯位於 3 樓出境大廳 H 櫃檯對面，亦有 Zimzero 等合作業者提供服務(3樓4號出口附近)"
           },
-
           { time: "16:55", name: "從仁川到弘大", icon: "🚇",
             highlight: "認準「一般列車」（All-stop Train），不能搭乘「直通車」（Express Train）",
             transport: "從仁川機場第2航廈前往弘大，最快方式是搭乘機場快線AREX普通車，搭乘位置在地下一樓轉乘中心「機場鐵道」處 ，可以現場購買單程票，或是在進站閘口旁邊，有販售T-money交通卡的機器，用T-money交通卡刷卡進站"
           },
-
           { time: "17:55", name: "Hongik University Station", icon: "🎨",
             intro: "弘大位於首爾的麻浦區，是年輕人和潮流愛好者的天堂，因周圍的弘益大學而得名。白天的弘大充滿藝術氣息，街頭藝人的表演、壁畫小巷的創意塗鴉隨處可見；夜晚則變身活力四射的派對聖地，無論是想感受韓國潮流文化，還是尋找獨特的旅行體驗，弘大都是遊客不容錯過的目的地"
           },
@@ -222,20 +219,16 @@
           { time: "21:25", name: "弘益藥局", icon: "💧", nav: "https://naver.me/GyynuVlR",
             intro: "買涼感眼藥水"
           },
-
           { time: "21:35", name: "從弘大回仁川機場", icon: "🚇", nav: "https://naver.me/5vYH2mKl",
             highlight: "認準「一般列車」（All-stop Train），不能搭乘「直通車」（Express Train）",
             transport: "從弘大前往仁川機場，建議提早搭乘 AREX 普通車，抓 22:00 左右回到仁川機場比較保險。若寄放在第2航廈、但芬蘭航空於第1航廈出發，拿完行李後還要預留航廈移動時間。"
           },
-
           { time: "22:00", name: "回到仁川機場", icon: "🏢",
             intro: "22:00 前回到仁川機場，準備拿寄放的行李。"
           },
-
           { time: "22:10", name: "拿寄放的行李", icon: "🎒",
             intro: "先取回寄放行李，再確認是否需要從第2航廈移動至第1航廈辦理後續搭機。"
           },
-
           { time: "23:00", name: "AY042 芬蘭航空 首爾 ✈️ 赫爾辛基", icon: "✈️", type: "flight",
             detail: "23:00搭乘芬蘭航空出發(首爾仁川國際機場第1航廈)→HEL 05:40抵達芬蘭赫爾辛基萬塔機場",
             intro: "抵達 HEL 後，搭乘火車 P 線或 I 線前往赫爾辛基中央車站，通常最方便。到中央車站後可前往地下一樓寄放行李，再開始市區行程。"
@@ -677,8 +670,24 @@
     }
 
     function App() {
-      const [view, setView] = useState('cover');
-      const [day, setDay] = useState(0);
+      const [view, setView] = useState(() => {
+        try {
+          const saved = localStorage.getItem('finland-trip-current-view');
+          return saved || 'cover';
+        } catch (e) {
+          return 'cover';
+        }
+      });
+
+      const [day, setDay] = useState(() => {
+        try {
+          const saved = Number(localStorage.getItem('finland-trip-current-day'));
+          return Number.isInteger(saved) && saved >= 0 && saved < ITINERARY.length ? saved : 0;
+        } catch (e) {
+          return 0;
+        }
+      });
+
       const [records, setRecords] = useState([]);
       const [modal, setModal] = useState(null);
 
@@ -740,6 +749,18 @@
           localStorage.setItem('finland-trip-packing-checks', JSON.stringify(packingChecks));
         } catch (e) {}
       }, [packingChecks]);
+
+      useEffect(() => {
+        try {
+          localStorage.setItem('finland-trip-current-view', view);
+        } catch (e) {}
+      }, [view]);
+
+      useEffect(() => {
+        try {
+          localStorage.setItem('finland-trip-current-day', String(day));
+        } catch (e) {}
+      }, [day]);
 
       useEffect(() => {
         fetch('https://api.exchangerate-api.com/v4/latest/EUR')
@@ -1127,12 +1148,12 @@
                     <input
                       type="number"
                       placeholder="金額"
-                      className="w-[58%] min-w-0 p-5 bg-slate-50 rounded-3xl font-black text-3xl leading-tight border border-slate-100 outline-none"
+                      className="w-[50%] min-w-0 p-5 bg-slate-50 rounded-3xl font-black text-3xl leading-tight border border-slate-100 outline-none"
                       value={amt}
                       onChange={e=>setAmt(e.target.value)}
                     />
                     <select
-                      className="w-[42%] min-w-0 bg-slate-100 rounded-3xl px-3 py-4 font-black text-blue-600 text-2xl leading-tight outline-none"
+                      className="w-[50%] min-w-0 bg-slate-100 rounded-3xl px-4 py-4 font-black text-blue-600 text-xl leading-tight outline-none"
                       value={curr}
                       onChange={e=>setCurr(e.target.value)}
                     >
